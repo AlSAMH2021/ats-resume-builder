@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages, FileType } from "lucide-react";
+import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2 } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
@@ -14,6 +14,7 @@ import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
 import { exportToDocx } from "@/lib/exportDocx";
+import { encodeResumeToUrl, decodeResumeFromUrl } from "@/lib/shareResume";
 
 const STORAGE_KEY = "ats-resume-data";
 
@@ -43,6 +44,18 @@ const Index = () => {
   });
 
   const watchedData = form.watch();
+
+  // Load from shared URL on mount
+  useEffect(() => {
+    const shared = decodeResumeFromUrl();
+    if (shared) {
+      form.reset(shared);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      toast.success(lang === 'ar' ? "تم تحميل السيرة من الرابط" : "Resume loaded from shared link");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-save
   useEffect(() => {
@@ -89,6 +102,16 @@ const Index = () => {
     }
   }, [watchedData, lang]);
 
+  const handleShare = useCallback(async () => {
+    const url = encodeResumeToUrl(watchedData);
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(lang === 'ar' ? "تم نسخ رابط المشاركة" : "Share link copied to clipboard");
+    } catch {
+      toast.error(lang === 'ar' ? "فشل النسخ" : "Copy failed");
+    }
+  }, [watchedData, lang]);
+
   const toggleLang = useCallback(() => {
     setLang(prev => prev === 'en' ? 'ar' : 'en');
   }, []);
@@ -119,6 +142,10 @@ const Index = () => {
             <Button type="button" variant="outline" size="sm" onClick={handleCopyText}>
               <Copy className="w-3.5 h-3.5 me-1" />
               {l("Copy Text", "نسخ النص")}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={handleShare}>
+              <Share2 className="w-3.5 h-3.5 me-1" />
+              {l("Share Link", "مشاركة")}
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleExportDocx}>
               <FileType className="w-3.5 h-3.5 me-1" />
