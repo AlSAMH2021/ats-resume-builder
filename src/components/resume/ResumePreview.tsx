@@ -1,18 +1,20 @@
 import type { ResumeData } from "@/types/resume";
+import type { ResumeTemplate } from "./TemplateSelector";
 
 interface Props {
   data: ResumeData;
   lang: 'en' | 'ar';
+  template?: ResumeTemplate;
 }
 
 const l = (lang: string, en: string, ar: string) => lang === 'ar' ? ar : en;
 
-export default function ResumePreview({ data, lang }: Props) {
+export default function ResumePreview({ data, lang, template = "classic" }: Props) {
   const hasContent = (val: string | undefined) => val && val.trim().length > 0;
   const contactParts = [data.location, data.phone, data.email, data.linkedin, data.website].filter(Boolean);
 
   return (
-    <div className="resume-preview" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`resume-preview resume-${template}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Name & Title */}
       {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
       {hasContent(data.jobTitle) && <p style={{ fontSize: '12pt', marginBottom: '4pt' }}>{data.jobTitle}</p>}
