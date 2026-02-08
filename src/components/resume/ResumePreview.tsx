@@ -1,17 +1,23 @@
 import type { ResumeData } from "@/types/resume";
 import type { ResumeTemplate } from "./TemplateSelector";
+import type { ResumeColors } from "./ColorCustomizer";
+import { defaultResumeColors } from "./ColorCustomizer";
 
 interface Props {
   data: ResumeData;
   lang: 'en' | 'ar';
   template?: ResumeTemplate;
+  colors?: ResumeColors;
 }
 
 const l = (lang: string, en: string, ar: string) => lang === 'ar' ? ar : en;
 
-export default function ResumePreview({ data, lang, template = "classic" }: Props) {
+export default function ResumePreview({ data, lang, template = "classic", colors }: Props) {
+  const c = colors || defaultResumeColors;
   const hasContent = (val: string | undefined) => val && val.trim().length > 0;
   const contactParts = [data.location, data.phone, data.email, data.linkedin, data.website].filter(Boolean);
+
+  const h2Style = { color: c.headingColor, borderBottomColor: c.lineColor };
 
   return (
     <div className={`resume-preview resume-${template}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -27,7 +33,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Summary */}
       {hasContent(data.summary) && (
         <>
-          <h2>{l(lang, "PROFESSIONAL SUMMARY", "الملخص المهني")}</h2>
+          <h2 style={h2Style}>{l(lang, "PROFESSIONAL SUMMARY", "الملخص المهني")}</h2>
           <p>{data.summary}</p>
         </>
       )}
@@ -35,7 +41,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Experience */}
       {data.experiences && data.experiences.length > 0 && data.experiences.some(e => hasContent(e.jobTitle) || hasContent(e.company)) && (
         <>
-          <h2>{l(lang, "EXPERIENCE", "الخبرات")}</h2>
+          <h2 style={h2Style}>{l(lang, "EXPERIENCE", "الخبرات")}</h2>
           {data.experiences.map((exp, i) => (
             <div key={i} style={{ marginBottom: '8pt' }}>
               <h3>
@@ -63,7 +69,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Education */}
       {data.education && data.education.length > 0 && data.education.some(e => hasContent(e.degree) || hasContent(e.institution)) && (
         <>
-          <h2>{l(lang, "EDUCATION", "التعليم")}</h2>
+          <h2 style={h2Style}>{l(lang, "EDUCATION", "التعليم")}</h2>
           {data.education.map((edu, i) => (
             <div key={i} style={{ marginBottom: '6pt' }}>
               <h3>
@@ -82,7 +88,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Certifications */}
       {data.certifications && data.certifications.length > 0 && data.certifications.some(c => hasContent(c.name)) && (
         <>
-          <h2>{l(lang, "CERTIFICATIONS", "الشهادات")}</h2>
+          <h2 style={h2Style}>{l(lang, "CERTIFICATIONS", "الشهادات")}</h2>
           {data.certifications.map((cert, i) => (
             <p key={i}>
               <strong>{cert.name}</strong>
@@ -96,7 +102,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Skills */}
       {hasContent(data.skills) && (
         <>
-          <h2>{l(lang, "SKILLS", "المهارات")}</h2>
+          <h2 style={h2Style}>{l(lang, "SKILLS", "المهارات")}</h2>
           <p>{data.skills}</p>
         </>
       )}
@@ -104,7 +110,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Languages */}
       {data.languages && data.languages.length > 0 && data.languages.some(lg => hasContent(lg.name)) && (
         <>
-          <h2>{l(lang, "LANGUAGES", "اللغات")}</h2>
+          <h2 style={h2Style}>{l(lang, "LANGUAGES", "اللغات")}</h2>
           <p>{data.languages.filter(lg => lg.name).map(lg => `${lg.name}${lg.level ? ` (${lg.level})` : ""}`).join("  •  ")}</p>
         </>
       )}
@@ -112,7 +118,7 @@ export default function ResumePreview({ data, lang, template = "classic" }: Prop
       {/* Projects */}
       {data.projects && data.projects.length > 0 && data.projects.some(p => hasContent(p.name)) && (
         <>
-          <h2>{l(lang, "PROJECTS", "المشاريع")}</h2>
+          <h2 style={h2Style}>{l(lang, "PROJECTS", "المشاريع")}</h2>
           {data.projects.map((proj, i) => (
             <div key={i} style={{ marginBottom: '6pt' }}>
               <h3>{proj.name}</h3>
