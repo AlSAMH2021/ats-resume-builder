@@ -9,6 +9,7 @@ import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
 import ColorCustomizer, { type ResumeColors, templateDefaultColors } from "@/components/resume/ColorCustomizer";
+import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
@@ -27,6 +28,7 @@ const Index = () => {
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [template, setTemplate] = useState<ResumeTemplate>('classic');
   const [colors, setColors] = useState<ResumeColors>(templateDefaultColors.classic);
+  const [sectionOrder, setSectionOrder] = useState<ResumeSection[]>(defaultSectionOrder);
 
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
     setTemplate(t);
@@ -126,6 +128,9 @@ const Index = () => {
               <div className="mt-3">
                 <ColorCustomizer value={colors} onChange={setColors} lang={lang} />
               </div>
+              <div className="mt-3">
+                <SectionReorder order={sectionOrder} onChange={setSectionOrder} lang={lang} />
+              </div>
               <div className="mt-4">
                 <ResumeForm lang={lang} />
               </div>
@@ -135,7 +140,7 @@ const Index = () => {
           {/* Right: Preview */}
           <div className="h-[calc(100vh-57px)] overflow-auto bg-muted/50 p-6 flex justify-center">
             <div className="bg-white shadow-lg border w-full max-w-[210mm] min-h-[297mm] p-[15mm] rounded-sm">
-              <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} />
+              <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} sectionOrder={sectionOrder} />
             </div>
           </div>
         </div>
@@ -143,7 +148,7 @@ const Index = () => {
 
       {/* Print-only preview */}
       <div className="hidden print-only">
-        <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} />
+        <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} sectionOrder={sectionOrder} />
       </div>
     </div>
   );
