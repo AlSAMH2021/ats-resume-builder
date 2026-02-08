@@ -103,15 +103,15 @@ const Index = () => {
               {l("Load Demo", "تحميل مثال")}
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleReset} className="text-destructive">
-              <RotateCcw className="w-3.5 h-3.5 mr-1" />
+              <RotateCcw className="w-3.5 h-3.5 me-1" />
               {l("Reset", "مسح")}
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleCopyText}>
-              <Copy className="w-3.5 h-3.5 mr-1" />
+              <Copy className="w-3.5 h-3.5 me-1" />
               {l("Copy Text", "نسخ النص")}
             </Button>
             <Button type="button" size="sm" onClick={handlePrint} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <FileDown className="w-3.5 h-3.5 mr-1" />
+              <FileDown className="w-3.5 h-3.5 me-1" />
               {l("Download PDF", "تحميل PDF")}
             </Button>
           </div>
@@ -122,8 +122,8 @@ const Index = () => {
       <FormProvider {...form}>
         <div className="no-print max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[calc(100vh-57px)]">
           {/* Left: Form */}
-          <ScrollArea className="h-[calc(100vh-57px)] border-e">
-            <div className="p-5">
+          <ScrollArea className="h-[calc(100vh-57px)] border-e" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="p-5" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
               <TemplateSelector value={template} onChange={handleTemplateChange} lang={lang} />
               <div className="mt-3">
                 <ColorCustomizer value={colors} onChange={setColors} lang={lang} />
