@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { FileDown, Copy, RotateCcw, FileText, Languages } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
+import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
@@ -23,6 +24,7 @@ function loadSavedData(): ResumeData {
 
 const Index = () => {
   const [lang, setLang] = useState<'en' | 'ar'>('en');
+  const [template, setTemplate] = useState<ResumeTemplate>('classic');
   const form = useForm<ResumeData>({
     resolver: zodResolver(resumeSchema),
     defaultValues: loadSavedData(),
@@ -112,14 +114,17 @@ const Index = () => {
           {/* Left: Form */}
           <ScrollArea className="h-[calc(100vh-57px)] border-e">
             <div className="p-5">
-              <ResumeForm lang={lang} />
+              <TemplateSelector value={template} onChange={setTemplate} lang={lang} />
+              <div className="mt-4">
+                <ResumeForm lang={lang} />
+              </div>
             </div>
           </ScrollArea>
 
           {/* Right: Preview */}
           <div className="h-[calc(100vh-57px)] overflow-auto bg-muted/50 p-6 flex justify-center">
             <div className="bg-white shadow-lg border w-full max-w-[210mm] min-h-[297mm] p-[15mm] rounded-sm">
-              <ResumePreview data={watchedData} lang={lang} />
+              <ResumePreview data={watchedData} lang={lang} template={template} />
             </div>
           </div>
         </div>
@@ -127,7 +132,7 @@ const Index = () => {
 
       {/* Print-only preview */}
       <div className="hidden print-only">
-        <ResumePreview data={watchedData} lang={lang} />
+        <ResumePreview data={watchedData} lang={lang} template={template} />
       </div>
     </div>
   );

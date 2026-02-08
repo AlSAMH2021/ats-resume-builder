@@ -144,6 +144,74 @@
   color: #444;
 }
 
+/* ── Modern Template ── */
+.resume-modern {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.resume-modern h1 {
+  font-size: 22pt;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.resume-modern h2 {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 2.5px solid #2a7a8c;
+  color: #2a7a8c;
+  padding-bottom: 3pt;
+}
+
+.resume-modern h3 {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* ── Minimal Template ── */
+.resume-minimal {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+}
+
+.resume-minimal h1 {
+  font-size: 16pt;
+  font-weight: 600;
+  margin-bottom: 1pt;
+}
+
+.resume-minimal h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 9pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 0.75px solid #999;
+  color: #555;
+  padding-bottom: 2pt;
+  margin-top: 10pt;
+  margin-bottom: 4pt;
+}
+
+.resume-minimal h3 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10pt;
+  font-weight: 600;
+}
+
+.resume-minimal ul {
+  padding-left: 12pt;
+  margin: 2pt 0;
+}
+
+.resume-minimal ul li {
+  margin-bottom: 1pt;
+}
+
 /* Print Styles */
 @media print {
   body {
