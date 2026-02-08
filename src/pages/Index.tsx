@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages } from "lucide-react";
+import { FileDown, Copy, RotateCcw, FileText, Languages, FileType } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
@@ -13,6 +13,7 @@ import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/compo
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
+import { exportToDocx } from "@/lib/exportDocx";
 
 const STORAGE_KEY = "ats-resume-data";
 
@@ -69,6 +70,15 @@ const Index = () => {
     window.print();
   }, []);
 
+  const handleExportDocx = useCallback(async () => {
+    try {
+      await exportToDocx(watchedData, lang, sectionOrder);
+      toast.success(lang === 'ar' ? "تم تصدير ملف Word" : "Word file exported");
+    } catch {
+      toast.error(lang === 'ar' ? "فشل التصدير" : "Export failed");
+    }
+  }, [watchedData, lang, sectionOrder]);
+
   const handleCopyText = useCallback(async () => {
     const text = resumeToPlainText(watchedData, lang);
     try {
@@ -109,6 +119,10 @@ const Index = () => {
             <Button type="button" variant="outline" size="sm" onClick={handleCopyText}>
               <Copy className="w-3.5 h-3.5 me-1" />
               {l("Copy Text", "نسخ النص")}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={handleExportDocx}>
+              <FileType className="w-3.5 h-3.5 me-1" />
+              {l("Word", "Word")}
             </Button>
             <Button type="button" size="sm" onClick={handlePrint} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <FileDown className="w-3.5 h-3.5 me-1" />
