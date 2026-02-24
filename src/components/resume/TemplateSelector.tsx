@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type ResumeTemplate = "classic" | "modern" | "minimal";
+export type ResumeTemplate = "classic" | "modern" | "minimal" | "executive";
 
 interface Props {
   value: ResumeTemplate;
@@ -12,6 +12,7 @@ const templates: { id: ResumeTemplate; labelEn: string; labelAr: string; desc: s
   { id: "classic", labelEn: "Classic", labelAr: "كلاسيكي", desc: "Serif · Traditional" },
   { id: "modern", labelEn: "Modern", labelAr: "عصري", desc: "Sans-serif · Bold" },
   { id: "minimal", labelEn: "Minimal", labelAr: "بسيط", desc: "Clean · Compact" },
+  { id: "executive", labelEn: "Executive", labelAr: "تنفيذي", desc: "Premium · Elegant" },
 ];
 
 export default function TemplateSelector({ value, onChange, lang }: Props) {

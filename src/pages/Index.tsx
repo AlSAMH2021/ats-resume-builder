@@ -4,19 +4,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2 } from "lucide-react";
+import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2 } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
 import ColorCustomizer, { type ResumeColors, templateDefaultColors } from "@/components/resume/ColorCustomizer";
 import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
+import OnboardingQuiz, { type OnboardingTargets } from "@/components/resume/OnboardingQuiz";
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
 import { exportToDocx } from "@/lib/exportDocx";
 import { encodeResumeToUrl, decodeResumeFromUrl } from "@/lib/shareResume";
+import seeratyLogo from "@/assets/seeraty_logo.png";
 
 const STORAGE_KEY = "ats-resume-data";
+const ONBOARDING_KEY = "seeraty-onboarding-done";
+const TARGETS_KEY = "seeraty-targets";
 
 function loadSavedData(): ResumeData {
   try {
@@ -27,10 +31,20 @@ function loadSavedData(): ResumeData {
 }
 
 const Index = () => {
-  const [lang, setLang] = useState<'en' | 'ar'>('en');
+  const [lang, setLang] = useState<'en' | 'ar'>('ar');
   const [template, setTemplate] = useState<ResumeTemplate>('classic');
   const [colors, setColors] = useState<ResumeColors>(templateDefaultColors.classic);
   const [sectionOrder, setSectionOrder] = useState<ResumeSection[]>(defaultSectionOrder);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem(ONBOARDING_KEY);
+  });
+  const [targets, setTargets] = useState<OnboardingTargets | null>(() => {
+    try {
+      const saved = localStorage.getItem(TARGETS_KEY);
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+  const [showTargets, setShowTargets] = useState(false);
 
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
     setTemplate(t);
@@ -50,9 +64,9 @@ const Index = () => {
     const shared = decodeResumeFromUrl();
     if (shared) {
       form.reset(shared);
-      // Clean URL
       window.history.replaceState({}, "", window.location.pathname);
       toast.success(lang === 'ar' ? "تم تحميل السيرة من الرابط" : "Resume loaded from shared link");
+      setShowOnboarding(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -66,6 +80,20 @@ const Index = () => {
     });
     return () => sub.unsubscribe();
   }, [form]);
+
+  const handleOnboardingComplete = useCallback((t: OnboardingTargets) => {
+    setTargets(t);
+    setLang(t.language as 'en' | 'ar');
+    localStorage.setItem(ONBOARDING_KEY, "true");
+    localStorage.setItem(TARGETS_KEY, JSON.stringify(t));
+    setShowOnboarding(false);
+    toast.success(t.language === 'ar' ? "تم حفظ مستهدفاتك!" : "Your targets are saved!");
+  }, []);
+
+  const handleOnboardingSkip = useCallback(() => {
+    localStorage.setItem(ONBOARDING_KEY, "true");
+    setShowOnboarding(false);
+  }, []);
 
   const handleDemoData = useCallback(() => {
     const data = lang === 'ar' ? demoDataAr : demoDataEn;
@@ -118,20 +146,29 @@ const Index = () => {
 
   const l = (en: string, ar: string) => lang === 'ar' ? ar : en;
 
+  if (showOnboarding) {
+    return <OnboardingQuiz lang={lang} onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />;
+  }
+
   return (
     <div className="min-h-screen bg-background" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <header className="no-print border-b bg-card sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-accent" />
-            <h1 className="text-lg font-bold text-primary">{l("ATS Resume Builder", "منشئ السيرة الذاتية ATS")}</h1>
+            <img src={seeratyLogo} alt="سيرتي Seeraty" className="h-8" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button type="button" variant="outline" size="sm" onClick={toggleLang} className="gap-1.5">
               <Languages className="w-4 h-4" />
               {lang === 'ar' ? 'English' : 'عربي'}
             </Button>
+            {targets && (
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowTargets(!showTargets)}>
+                <Settings2 className="w-3.5 h-3.5 me-1" />
+                {l("Targets", "المستهدفات")}
+              </Button>
+            )}
             <Button type="button" variant="outline" size="sm" onClick={handleDemoData}>
               {l("Load Demo", "تحميل مثال")}
             </Button>
@@ -151,13 +188,36 @@ const Index = () => {
               <FileType className="w-3.5 h-3.5 me-1" />
               {l("Word", "Word")}
             </Button>
-            <Button type="button" size="sm" onClick={handlePrint} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button type="button" size="sm" onClick={handlePrint} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <FileDown className="w-3.5 h-3.5 me-1" />
               {l("Download PDF", "تحميل PDF")}
             </Button>
           </div>
         </div>
       </header>
+
+      {/* Targets Bar */}
+      {showTargets && targets && (
+        <div className="no-print border-b bg-primary/5 px-4 py-3">
+          <div className="max-w-[1600px] mx-auto flex items-center gap-4 flex-wrap">
+            <span className="text-sm font-semibold text-primary">{l("Your Targets:", "مستهدفاتك:")}</span>
+            <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.experienceLevel}</span>
+            <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.industry}</span>
+            <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.goal}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => {
+                localStorage.removeItem(ONBOARDING_KEY);
+                setShowOnboarding(true);
+              }}
+            >
+              {l("Edit Targets", "تعديل المستهدفات")}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <FormProvider {...form}>
