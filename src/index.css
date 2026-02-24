@@ -264,6 +264,130 @@
   letter-spacing: 0.5px;
 }
 
+/* ── Seeraty Signature Template ── */
+.resume-seeraty {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  position: relative;
+  padding-top: 0;
+}
+
+.resume-seeraty .seeraty-accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 0 0 2px 2px;
+}
+
+[dir="rtl"] .resume-seeraty .seeraty-accent-bar {
+  border-radius: 0 0 2px 2px;
+}
+
+.resume-seeraty .seeraty-header {
+  padding-top: 14pt;
+  padding-bottom: 12pt;
+  border-bottom: 2px solid #f0ebff;
+  margin-bottom: 10pt;
+  text-align: center;
+}
+
+.resume-seeraty h1 {
+  font-size: 22pt;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 2pt;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resume-seeraty .seeraty-job-title {
+  font-size: 11pt;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 6pt;
+  letter-spacing: 0.3px;
+}
+
+.resume-seeraty .seeraty-contact {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6pt;
+}
+
+.resume-seeraty .seeraty-contact-item {
+  font-size: 9pt;
+  color: #666;
+  padding: 2pt 8pt;
+  background: #f8f5ff;
+  border-radius: 12pt;
+  border: 0.5px solid #e9e0ff;
+}
+
+.resume-seeraty .seeraty-body {
+  padding: 0;
+}
+
+.resume-seeraty .seeraty-section {
+  margin-bottom: 2pt;
+}
+
+.resume-seeraty h2 {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: none;
+  padding: 4pt 10pt;
+  margin-top: 10pt;
+  margin-bottom: 5pt;
+  background: linear-gradient(90deg, #f5f0ff 0%, transparent 100%);
+  border-left: 3px solid #7c3aed;
+  border-radius: 0 4px 4px 0;
+}
+
+[dir="rtl"] .resume-seeraty h2 {
+  border-left: none;
+  border-right: 3px solid #7c3aed;
+  background: linear-gradient(270deg, #f5f0ff 0%, transparent 100%);
+  border-radius: 4px 0 0 4px;
+}
+
+.resume-seeraty h3 {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+
+.resume-seeraty ul {
+  padding-left: 14pt;
+  margin: 3pt 0;
+}
+
+.resume-seeraty ul li {
+  margin-bottom: 2pt;
+  position: relative;
+}
+
+.resume-seeraty ul li::marker {
+  color: #7c3aed;
+}
+
+.resume-seeraty .seeraty-watermark {
+  text-align: center;
+  font-size: 7pt;
+  opacity: 0.2;
+  letter-spacing: 3px;
+  margin-top: 20pt;
+  font-weight: 600;
+}
+
 /* Print Styles */
 @media print {
   body {

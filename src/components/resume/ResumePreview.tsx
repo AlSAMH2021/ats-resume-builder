@@ -99,6 +99,47 @@ export default function ResumePreview({ data, lang, template = "classic", colors
     ) : null,
   };
 
+  // Seeraty signature template — unique branded layout
+  if (template === "seeraty") {
+    return (
+      <div className="resume-preview resume-seeraty" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+        {/* Purple accent bar */}
+        <div className="seeraty-accent-bar" style={{ background: `linear-gradient(135deg, ${c.headingColor}, ${c.lineColor})` }} />
+
+        {/* Header with name + contact in a branded block */}
+        <div className="seeraty-header">
+          {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
+          {hasContent(data.jobTitle) && <p className="seeraty-job-title">{data.jobTitle}</p>}
+          {contactParts.length > 0 && (
+            <div className="seeraty-contact">
+              {contactParts.map((part, i) => (
+                <span key={i} className="seeraty-contact-item">{part}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Sections */}
+        <div className="seeraty-body">
+          {order.map(s => {
+            const section = sections[s];
+            if (!section) return null;
+            return (
+              <div key={s} className="seeraty-section">
+                {section}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Watermark */}
+        <div className="seeraty-watermark" style={{ color: c.headingColor }}>
+          سيرتي | Seeraty
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`resume-preview resume-${template}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
