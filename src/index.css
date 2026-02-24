@@ -13,16 +13,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 30% 15%;
 
-    --primary: 218 40% 22%;
+    --primary: 262 72% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 93%;
-    --secondary-foreground: 220 30% 15%;
+    --secondary: 262 20% 94%;
+    --secondary-foreground: 262 40% 20%;
 
-    --muted: 210 12% 90%;
-    --muted-foreground: 215 15% 48%;
+    --muted: 262 12% 91%;
+    --muted-foreground: 262 15% 48%;
 
-    --accent: 190 75% 38%;
+    --accent: 275 65% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 50%;
@@ -30,7 +30,7 @@
 
     --border: 214 20% 88%;
     --input: 214 20% 88%;
-    --ring: 218 40% 22%;
+    --ring: 262 72% 50%;
 
     --radius: 0.5rem;
 
@@ -54,8 +54,8 @@
     --popover: 220 25% 12%;
     --popover-foreground: 210 20% 92%;
 
-    --primary: 190 75% 50%;
-    --primary-foreground: 220 30% 10%;
+    --primary: 262 72% 60%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 18%;
     --secondary-foreground: 210 20% 92%;
@@ -63,7 +63,7 @@
     --muted: 220 20% 18%;
     --muted-foreground: 215 15% 60%;
 
-    --accent: 190 75% 38%;
+    --accent: 275 65% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -71,7 +71,7 @@
 
     --border: 220 20% 22%;
     --input: 220 20% 22%;
-    --ring: 190 75% 50%;
+    --ring: 262 72% 60%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -210,6 +210,58 @@
 
 .resume-minimal ul li {
   margin-bottom: 1pt;
+}
+
+/* ── Executive Template ── */
+.resume-executive {
+  font-family: 'Cambria', 'Palatino Linotype', 'Book Antiqua', serif;
+  font-size: 10.5pt;
+  line-height: 1.5;
+}
+
+.resume-executive h1 {
+  font-size: 24pt;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 3px double #6d28d9;
+  padding-bottom: 6pt;
+  margin-bottom: 4pt;
+}
+
+.resume-executive h2 {
+  font-family: 'Cambria', serif;
+  font-size: 11pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #6d28d9;
+  border-bottom: none;
+  background: linear-gradient(90deg, #f3e8ff 0%, transparent 100%);
+  padding: 4pt 8pt;
+  margin-top: 14pt;
+  margin-bottom: 6pt;
+  border-left: 3px solid #6d28d9;
+}
+
+.resume-executive h3 {
+  font-family: 'Cambria', serif;
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+
+.resume-executive ul {
+  padding-left: 14pt;
+  margin: 3pt 0;
+}
+
+.resume-executive ul li {
+  margin-bottom: 2pt;
+}
+
+.resume-executive .contact-line {
+  font-size: 9.5pt;
+  letter-spacing: 0.5px;
 }
 
 /* Print Styles */
