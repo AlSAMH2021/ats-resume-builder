@@ -11,11 +11,13 @@ import TemplateSelector, { type ResumeTemplate } from "@/components/resume/Templ
 import ColorCustomizer, { type ResumeColors, templateDefaultColors } from "@/components/resume/ColorCustomizer";
 import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
 import OnboardingQuiz, { type OnboardingTargets } from "@/components/resume/OnboardingQuiz";
+import SetupReadyScreen from "@/components/resume/SetupReadyScreen";
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
 import { exportToDocx } from "@/lib/exportDocx";
 import { encodeResumeToUrl, decodeResumeFromUrl } from "@/lib/shareResume";
+import { generateSmartSetup, type SmartSetupResult } from "@/lib/smartSetup";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
 const STORAGE_KEY = "ats-resume-data";
@@ -38,6 +40,7 @@ const Index = () => {
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem(ONBOARDING_KEY);
   });
+  const [smartSetup, setSmartSetup] = useState<SmartSetupResult | null>(null);
   const [targets, setTargets] = useState<OnboardingTargets | null>(() => {
     try {
       const saved = localStorage.getItem(TARGETS_KEY);
@@ -87,8 +90,21 @@ const Index = () => {
     localStorage.setItem(ONBOARDING_KEY, "true");
     localStorage.setItem(TARGETS_KEY, JSON.stringify(t));
     setShowOnboarding(false);
-    toast.success(t.language === 'ar' ? "تم حفظ مستهدفاتك!" : "Your targets are saved!");
+    // Generate smart setup and show the ready screen
+    const setup = generateSmartSetup(t);
+    setSmartSetup(setup);
   }, []);
+
+  const handleSetupOpen = useCallback(() => {
+    if (!smartSetup) return;
+    // Apply template, section order, colors, and pre-filled data
+    setTemplate(smartSetup.template);
+    setColors(templateDefaultColors[smartSetup.template]);
+    setSectionOrder(smartSetup.sectionOrder);
+    form.reset(smartSetup.prefilled);
+    setSmartSetup(null);
+    toast.success(lang === 'ar' ? "تم إعداد سيرتك الذاتية — ابدأ التعديل!" : "Your CV is ready — start editing!");
+  }, [smartSetup, form, lang]);
 
   const handleOnboardingSkip = useCallback(() => {
     localStorage.setItem(ONBOARDING_KEY, "true");
@@ -149,6 +165,11 @@ const Index = () => {
   if (showOnboarding) {
     return <OnboardingQuiz lang={lang} onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />;
   }
+
+  if (smartSetup) {
+    return <SetupReadyScreen setup={smartSetup} lang={lang} onOpen={handleSetupOpen} />;
+  }
+
 
   return (
     <div className="min-h-screen bg-background" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
