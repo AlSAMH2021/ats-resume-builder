@@ -16,6 +16,7 @@ export const templateDefaultColors: Record<string, ResumeColors> = {
   modern: { headingColor: "#2a7a8c", lineColor: "#2a7a8c" },
   minimal: { headingColor: "#555555", lineColor: "#999999" },
   executive: { headingColor: "#6d28d9", lineColor: "#8b5cf6" },
+  seeraty: { headingColor: "#7c3aed", lineColor: "#a78bfa" },
 };
 
 const presets = [
