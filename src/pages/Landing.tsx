@@ -10,6 +10,7 @@ import {
 import seeratyLogo from "@/assets/seeraty_logo.png";
 import RotatingText from "@/components/landing/RotatingText";
 import ResumeMockup from "@/components/landing/ResumeMockup";
+import trustedLogos from "@/components/landing/TrustedLogos";
 
 // Premium easing curves — landing page only
 const premiumEase = [0.22, 1, 0.36, 1] as const;
@@ -242,27 +243,33 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Trusted By */}
-      <section className="py-10 border-b bg-card/50">
+      {/* Trusted By — Logo Loop */}
+      <section className="py-10 border-b bg-card/50 overflow-hidden">
         <div className="max-w-5xl mx-auto px-4">
-          <motion.div
+          <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: premiumEase }}
-            className="text-center"
+            className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest mb-6 text-center"
           >
-            <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest mb-6">
-              {l("Trusted by professionals at", "يثق بنا محترفون في")}
-            </p>
-            <div className="flex items-center justify-center gap-8 sm:gap-12 flex-wrap opacity-40">
-              {["ARAMCO", "STC", "SABIC", "Neom", "stc pay", "Tamheer", "LinkedIn"].map((name) => (
-                <span key={name} className="text-lg sm:text-xl font-bold text-foreground tracking-wide select-none">
-                  {name}
-                </span>
-              ))}
-            </div>
-          </motion.div>
+            {l("Trusted by professionals at", "يثق بنا محترفون في")}
+          </motion.p>
+        </div>
+        <div className="relative">
+          {/* Fade edges */}
+          <div className="absolute inset-y-0 start-0 w-20 bg-gradient-to-e from-card/50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 end-0 w-20 bg-gradient-to-s from-card/50 to-transparent z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? 'right' : 'left'}, hsl(var(--card) / 0.5), transparent)` }} />
+          <div className="absolute inset-y-0 start-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? 'left' : 'right'}, hsl(var(--card) / 0.5), transparent)` }} />
+
+          {/* Marquee */}
+          <div className="flex animate-marquee gap-16 items-center" style={{ width: "max-content" }}>
+            {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+              <div key={i} className="flex-shrink-0 opacity-30 hover:opacity-60 transition-opacity duration-500 text-foreground">
+                {logo}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
