@@ -242,7 +242,30 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features — Scroll Stack */}
+      {/* Trusted By */}
+      <section className="py-10 border-b bg-card/50">
+        <div className="max-w-5xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: premiumEase }}
+            className="text-center"
+          >
+            <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest mb-6">
+              {l("Trusted by professionals at", "يثق بنا محترفون في")}
+            </p>
+            <div className="flex items-center justify-center gap-8 sm:gap-12 flex-wrap opacity-40">
+              {["ARAMCO", "STC", "SABIC", "Neom", "stc pay", "Tamheer", "LinkedIn"].map((name) => (
+                <span key={name} className="text-lg sm:text-xl font-bold text-foreground tracking-wide select-none">
+                  {name}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <section id="features" className="py-24" style={{ background: "hsl(var(--muted) / 0.35)" }}>
         <div className="max-w-6xl mx-auto px-4">
           <motion.div
