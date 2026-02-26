@@ -230,26 +230,44 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Scroll Stack Cards */}
+          <div className="relative max-w-xl mx-auto" style={{ height: `${features.length * 80 + 400}px` }}>
             {features.map((f, i) => (
               <motion.div
                 key={i}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-                variants={fadeUp}
-                className="rounded-2xl border bg-card p-6 hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300"
+                className="sticky top-32 mx-auto"
+                style={{
+                  marginTop: i === 0 ? 0 : "80px",
+                  zIndex: i + 1,
+                }}
               >
-                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <f.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {lang === "ar" ? f.titleAr : f.titleEn}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {lang === "ar" ? f.descAr : f.descEn}
-                </p>
+                <motion.div
+                  initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, ease: "easeOut" as const }}
+                  className="rounded-2xl border bg-card p-8 shadow-lg shadow-primary/5"
+                  style={{
+                    transform: `rotate(${i % 2 === 0 ? -0.5 : 0.5}deg)`,
+                  }}
+                >
+                  <div className="flex items-start gap-5">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <f.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {lang === "ar" ? f.titleAr : f.titleEn}
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                        {lang === "ar" ? f.descAr : f.descEn}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <span className="text-xs font-medium text-primary/50">{i + 1}/{features.length}</span>
+                  </div>
+                </motion.div>
               </motion.div>
             ))}
           </div>
