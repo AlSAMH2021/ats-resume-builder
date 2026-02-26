@@ -41,6 +41,7 @@ function buildSections(data: ResumeData, lang: string, order: ResumeSection[]): 
   const paragraphs: Paragraph[] = [];
 
   const sectionBuilders: Record<ResumeSection, () => void> = {
+    personal: () => {}, // rendered separately as header
     summary: () => {
       if (!hasContent(data.summary)) return;
       paragraphs.push(sectionHeading(l(lang, "Professional Summary", "الملخص المهني")));
