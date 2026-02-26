@@ -5,38 +5,161 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* ── Resume template archetypes ── */
+
+.resume-preview {
+  font-family: 'Calibri', 'Arial', sans-serif;
+  color: #222;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.resume-preview h1 {
+  margin: 0 0 2pt;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.resume-preview h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+  border-bottom: 1.5px solid;
+  padding-bottom: 2pt;
+  margin: 10pt 0 6pt;
 }
 
-.card {
-  padding: 2em;
+.resume-preview h3 {
+  font-size: inherit;
+  margin: 0;
 }
 
-.read-the-docs {
-  color: #888;
+.resume-preview ul {
+  margin: 4pt 0 0 16pt;
+  padding: 0;
+}
+
+.resume-preview li {
+  margin-bottom: 2pt;
+}
+
+.resume-preview .contact-line {
+  font-size: 10pt;
+  color: #555;
+  margin-bottom: 6pt;
+}
+
+/* ── Starter: Skills-first, visual, generous spacing ── */
+.resume-starter {
+  font-size: 11pt;
+  line-height: 1.5;
+}
+
+.resume-starter h1 {
+  font-size: 20pt;
+  font-weight: 700;
+}
+
+.resume-starter h2 {
+  font-size: 14pt;
+  margin: 14pt 0 8pt;
+}
+
+.resume-starter h3 {
+  font-size: 11pt;
+  font-weight: 600;
+}
+
+/* ── Academic: Structured, balanced spacing ── */
+.resume-academic {
+  font-size: 10.5pt;
+  line-height: 1.35;
+}
+
+.resume-academic h1 {
+  font-size: 18pt;
+  font-weight: 700;
+}
+
+.resume-academic h2 {
+  font-size: 13pt;
+  margin: 12pt 0 6pt;
+}
+
+.resume-academic h3 {
+  font-size: 10.5pt;
+  font-weight: 600;
+}
+
+/* ── Professional: ATS-optimized, compact, dense ── */
+.resume-professional {
+  font-size: 10pt;
+  line-height: 1.2;
+}
+
+.resume-professional h1 {
+  font-size: 16pt;
+  font-weight: 700;
+}
+
+.resume-professional h2 {
+  font-size: 12pt;
+  margin: 10pt 0 4pt;
+}
+
+.resume-professional h3 {
+  font-size: 10pt;
+  font-weight: 600;
+}
+
+/* ── Seeraty overlay (modifier, works with any template) ── */
+.seeraty-overlay .seeraty-accent-bar {
+  height: 6px;
+  border-radius: 3px;
+  margin-bottom: 16pt;
+}
+
+.seeraty-overlay .seeraty-header {
+  text-align: center;
+  margin-bottom: 14pt;
+  padding-bottom: 10pt;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.seeraty-overlay .seeraty-header h1 {
+  font-size: 22pt;
+  font-weight: 800;
+  margin-bottom: 4pt;
+}
+
+.seeraty-overlay .seeraty-job-title {
+  font-size: 12pt;
+  color: #6b7280;
+  margin-bottom: 8pt;
+}
+
+.seeraty-overlay .seeraty-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6pt;
+}
+
+.seeraty-overlay .seeraty-contact-item {
+  font-size: 9pt;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 3pt 10pt;
+  color: #374151;
+}
+
+.seeraty-overlay .seeraty-body {
+  margin-top: 8pt;
+}
+
+.seeraty-overlay .seeraty-section {
+  margin-bottom: 4pt;
+}
+
+.seeraty-overlay .seeraty-watermark {
+  text-align: center;
+  font-size: 8pt;
+  opacity: 0.25;
+  margin-top: 24pt;
+  letter-spacing: 2pt;
 }
