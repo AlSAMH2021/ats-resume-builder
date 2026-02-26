@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, CheckCircle2, Pencil, Sparkles, AlertTriangle, Ban } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Pencil, Sparkles, AlertTriangle, Ban, Home } from "lucide-react";
 import { validateSurveySelection, type Stage, type Goal } from "@/lib/personaEngine";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
@@ -101,6 +102,7 @@ const questions: QuestionConfig[] = [
 ];
 
 export default function OnboardingQuiz({ lang, onComplete, onSkip }: Props) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [targets, setTargets] = useState<OnboardingTargets>(defaultTargets);
   const [showSummary, setShowSummary] = useState(false);
@@ -187,7 +189,16 @@ export default function OnboardingQuiz({ lang, onComplete, onSkip }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--primary)/0.05)] via-background to-[hsl(var(--accent)/0.08)] flex items-center justify-center p-4" dir={lang === "ar" ? "rtl" : "ltr"}>
-      <Card className="w-full max-w-lg p-8 space-y-6 shadow-2xl border-primary/20">
+      <Card className="w-full max-w-lg p-8 space-y-6 shadow-2xl border-primary/20 relative">
+        {/* Back to Landing */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-4 start-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Home className="w-4 h-4" />
+          {lang === "ar" ? "الرئيسية" : "Home"}
+        </button>
+
         {/* Logo */}
         <div className="text-center">
           <img src={seeratyLogo} alt="Seeraty سيرتي" className="h-16 mx-auto mb-4" />
