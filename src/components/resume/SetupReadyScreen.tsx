@@ -37,7 +37,7 @@ export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {
     return () => clearInterval(interval);
   }, []);
 
-  const tName = templateNames[setup.template] || templateNames.classic;
+  const tName = templateNames[setup.template] || templateNames.starter;
   const strengths = lang === "ar" ? setup.strengthsAr : setup.strengthsEn;
   const reason = lang === "ar" ? setup.templateReasonAr : setup.templateReasonEn;
 
