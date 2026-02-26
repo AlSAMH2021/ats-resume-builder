@@ -215,61 +215,76 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="py-20 bg-muted/30">
+      {/* Features — Scroll Stack */}
+      <section id="features" className="py-24" style={{ background: "hsl(var(--muted) / 0.35)" }}>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-foreground">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: "easeOut" as const }}
+            className="text-center mb-6"
+          >
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               {l("Everything You Need", "كل ما تحتاجه")}
             </h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-4 text-muted-foreground max-w-lg mx-auto text-base">
               {l(
                 "Professional tools to create standout resumes that get you hired",
                 "أدوات احترافية لإنشاء سير ذاتية مميزة تحقق لك الوظيفة"
               )}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Scroll Stack Cards */}
-          <div className="relative max-w-xl mx-auto" style={{ height: `${features.length * 80 + 400}px` }}>
-            {features.map((f, i) => (
-              <motion.div
-                key={i}
-                className="sticky top-32 mx-auto"
-                style={{
-                  marginTop: i === 0 ? 0 : "80px",
-                  zIndex: i + 1,
-                }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.5, ease: "easeOut" as const }}
-                  className="rounded-2xl border bg-card p-8 shadow-lg shadow-primary/5"
+          {/* Stacked Cards Container */}
+          <div className="relative max-w-2xl mx-auto pt-8" style={{ paddingBottom: "6rem" }}>
+            {features.map((f, i) => {
+              const topOffset = 120 + i * 28;
+              return (
+                <div
+                  key={i}
+                  className="sticky"
                   style={{
-                    transform: `rotate(${i % 2 === 0 ? -0.5 : 0.5}deg)`,
+                    top: `${topOffset}px`,
+                    zIndex: i + 1,
+                    marginBottom: i < features.length - 1 ? "48px" : "0",
                   }}
                 >
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <f.icon className="w-6 h-6 text-primary" />
+                  <motion.div
+                    initial={{ opacity: 0, y: 50, scale: 0.92 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="rounded-[22px] bg-card border border-border/60 px-7 py-7 sm:px-9 sm:py-8"
+                    style={{
+                      boxShadow: `0 ${8 + i * 2}px ${20 + i * 6}px -${4 + i}px hsl(var(--primary) / ${0.06 + i * 0.01}), 0 2px 6px -2px hsl(var(--foreground) / 0.04)`,
+                    }}
+                  >
+                    <div className="flex items-start gap-5">
+                      <div
+                        className="w-13 h-13 min-w-[3.25rem] rounded-2xl flex items-center justify-center"
+                        style={{
+                          background: `linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.10))`,
+                        }}
+                      >
+                        <f.icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-foreground leading-snug">
+                          {lang === "ar" ? f.titleAr : f.titleEn}
+                        </h3>
+                        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                          {lang === "ar" ? f.descAr : f.descEn}
+                        </p>
+                      </div>
+                      <span className="text-[11px] font-semibold text-primary/30 tabular-nums flex-shrink-0 pt-1">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {lang === "ar" ? f.titleAr : f.titleEn}
-                      </h3>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                        {lang === "ar" ? f.descAr : f.descEn}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <span className="text-xs font-medium text-primary/50">{i + 1}/{features.length}</span>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
+                  </motion.div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
