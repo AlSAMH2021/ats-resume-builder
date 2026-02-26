@@ -225,22 +225,17 @@ const Landing = () => {
               {/* Heading */}
               <motion.h1
                 {...stagger(1, 0.05)}
-                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1]"
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-foreground leading-[1.15]"
               >
-                {l("Build Your CV for", "ابنِ سيرتك لـ")}
+                {l("Your Resume,", "سيرتك الذاتية،")}
                 <br />
-                <span
-                  className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-shift"
-                  style={{ backgroundSize: "200% auto" }}
-                >
-                  <RotatingText
-                    words={
-                      lang === "ar"
-                        ? ["وظيفة أحلامك", "التدريب التعاوني", "ترقيتك القادمة", "مشروعك الخاص"]
-                        : ["Your Dream Job", "A COOP Internship", "Your Next Role", "A Career Shift"]
-                    }
-                  />
-                </span>
+                <RotatingText
+                  words={
+                    lang === "ar"
+                      ? ["لوظيفة أحلامك", "للتدريب التعاوني", "لترقيتك القادمة", "لمستقبلك المهني"]
+                      : ["For Your Dream Job", "For Your COOP", "For Your Next Role", "For Your Future"]
+                  }
+                />
               </motion.h1>
 
               {/* Subtitle */}
@@ -249,8 +244,8 @@ const Landing = () => {
                 className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0"
               >
                 {l(
-                  "Seeraty analyzes your goals and builds a professional ATS-optimized resume — in minutes.",
-                  "سيرتي تحلل أهدافك وتبني سيرة ذاتية احترافية متوافقة مع ATS — في دقائق."
+                  "Answer 3 quick questions — we'll pick the right template, structure your sections, and help you write an ATS-ready resume in minutes.",
+                  "أجب على ٣ أسئلة سريعة — نختار لك القالب المناسب، نرتّب الأقسام، ونساعدك تكتب سيرة ذاتية جاهزة لأنظمة التوظيف في دقائق."
                 )}
               </motion.p>
 

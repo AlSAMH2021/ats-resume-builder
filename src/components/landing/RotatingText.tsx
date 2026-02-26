@@ -18,16 +18,16 @@ const RotatingText = ({ words, className = "", interval = 2800 }: RotatingTextPr
   }, [words.length, interval]);
 
   return (
-    <span className={`inline-block relative ${className}`}>
+    <span className={`inline-flex relative overflow-hidden ${className}`} style={{ minHeight: "1.2em" }}>
       <AnimatePresence mode="wait">
         <motion.span
-          key={index}
-          initial={{ y: 30, opacity: 0, rotateX: -40 }}
-          animate={{ y: 0, opacity: 1, rotateX: 0 }}
-          exit={{ y: -30, opacity: 0, rotateX: 40 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-block"
-          style={{ perspective: "600px" }}
+          key={words[index]}
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -40, opacity: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
+          style={{ backgroundSize: "200% auto", animation: "gradient-shift 3s ease infinite" }}
         >
           {words[index]}
         </motion.span>
