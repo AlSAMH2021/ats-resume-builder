@@ -1,33 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   FileText, Zap, Shield, Languages, Palette, Download,
-  Share2, Sparkles, ArrowLeft, ArrowRight, CheckCircle2,
-  Star, ChevronDown
+  Sparkles, ArrowLeft, ArrowRight, CheckCircle2,
+  Star, ChevronDown, Mouse
 } from "lucide-react";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 import RotatingText from "@/components/landing/RotatingText";
 import ResumeMockup from "@/components/landing/ResumeMockup";
 import trustedLogos from "@/components/landing/TrustedLogos";
+import CustomCursor from "@/components/landing/CustomCursor";
 
-// Premium easing curves — landing page only
 const premiumEase = [0.22, 1, 0.36, 1] as const;
 const smoothDecel = [0.16, 1, 0.3, 1] as const;
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.12, duration: 0.45, ease: premiumEase }
-  }),
-};
-
-const heroReveal = (delay: number) => ({
-  initial: { opacity: 0, y: 18 },
+const stagger = (i: number, base = 0.1) => ({
+  initial: { opacity: 0, y: 28 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.7, delay, ease: premiumEase },
+  transition: { delay: base + i * 0.12, duration: 0.6, ease: premiumEase },
 });
 
 const sectionReveal = {
@@ -35,6 +27,14 @@ const sectionReveal = {
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-60px" } as const,
   transition: { duration: 0.65, ease: premiumEase },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.12, duration: 0.45, ease: premiumEase }
+  }),
 };
 
 const features = [
@@ -54,10 +54,10 @@ const features = [
   },
   {
     icon: Palette,
-    titleAr: "قوالب احترافية متعددة",
-    titleEn: "Multiple Pro Templates",
-    descAr: "5 قوالب مصممة باحترافية بما فيها قالب سيرتي المميز",
-    descEn: "5 professionally designed templates including our signature Seeraty template",
+    titleAr: "3 قوالب ذكية",
+    titleEn: "3 Smart Templates",
+    descAr: "قوالب مصممة بذكاء تناسب مرحلتك المهنية وأهدافك",
+    descEn: "Intelligently designed templates that match your career stage and goals",
   },
   {
     icon: Languages,
@@ -87,47 +87,96 @@ const templates = [
     id: "starter",
     nameAr: "البداية",
     nameEn: "Starter",
-    descAr: "تصميم بصري يركز على المهارات — مثالي للمبتدئين",
-    descEn: "Skills-first visual design — perfect for beginners",
+    descAr: "مهاراتك أولاً — مثالي لبداية مسيرتك",
+    descEn: "Skills-first — perfect for starting your career",
     color: "#2a7a8c",
   },
   {
     id: "academic",
     nameAr: "الأكاديمي",
     nameEn: "Academic",
-    descAr: "تصميم متوازن ومنظم يناسب الطلاب والأكاديميين",
-    descEn: "Structured balanced design for students and academics",
+    descAr: "منظم ومتوازن — مثالي للتدريب التعاوني",
+    descEn: "Structured — ideal for COOP applications",
     color: "#1a1a1a",
   },
   {
     id: "professional",
     nameAr: "المهني",
     nameEn: "Professional",
-    descAr: "تصميم كثيف متوافق مع ATS للخريجين والمحترفين",
-    descEn: "ATS-optimized dense design for graduates and professionals",
-    color: "#1e293b",
+    descAr: "متوافق مع ATS — لوظيفتك الأولى",
+    descEn: "ATS-optimized — for your first full-time role",
+    color: "#7c3aed",
   },
 ];
 
 const stats = [
-  { valueAr: "3+", valueEn: "3+", labelAr: "قوالب احترافية", labelEn: "Pro Templates" },
-  { valueAr: "٢", valueEn: "2", labelAr: "لغات مدعومة", labelEn: "Languages" },
-  { valueAr: "٤", valueEn: "4", labelAr: "صيغ تصدير", labelEn: "Export Formats" },
-  { valueAr: "∞", valueEn: "∞", labelAr: "سير ذاتية مجانية", labelEn: "Free CVs" },
+  { valueAr: "3", valueEn: "3", labelAr: "قوالب", labelEn: "Templates" },
+  { valueAr: "٢", valueEn: "2", labelAr: "لغات", labelEn: "Languages" },
+  { valueAr: "٤", valueEn: "4", labelAr: "صيغ", labelEn: "Formats" },
+  { valueAr: "∞", valueEn: "∞", labelAr: "مجاني", labelEn: "Free" },
+];
+
+const steps = [
+  {
+    step: "1",
+    titleAr: "أجب على الاستبيان",
+    titleEn: "Answer the Survey",
+    descAr: "حدد خبرتك وتخصصك وهدفك الوظيفي في ٣٠ ثانية",
+    descEn: "Define your experience, field, and career goal in 30 seconds",
+  },
+  {
+    step: "2",
+    titleAr: "نُعد سيرتك تلقائياً",
+    titleEn: "We Auto-Setup Your CV",
+    descAr: "نختار القالب الأنسب ونرتب الأقسام ونملأ المحتوى المبدئي",
+    descEn: "We pick the best template, arrange sections, and fill initial content",
+  },
+  {
+    step: "3",
+    titleAr: "عدّل وحمّل",
+    titleEn: "Edit & Download",
+    descAr: "خصّص سيرتك بالتعديل المباشر ثم حمّلها PDF أو Word",
+    descEn: "Customize with live editing, then download as PDF or Word",
+  },
 ];
 
 const Landing = () => {
   const [lang, setLang] = useState<"ar" | "en">("ar");
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const l = (en: string, ar: string) => (lang === "ar" ? ar : en);
   const isRTL = lang === "ar";
 
   const handleStart = () => navigate("/builder");
 
+  // Navbar scroll detection
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Parallax for hero mockup
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const mockupY = useTransform(heroProgress, [0, 1], [0, 120]);
+  const mockupYSmooth = useSpring(mockupY, { stiffness: 80, damping: 20 });
+
   return (
     <div className="min-h-screen bg-background" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-lg">
+      <CustomCursor />
+
+      {/* ── Navbar ── */}
+      <nav
+        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? "bg-card/90 backdrop-blur-xl border-border/40"
+            : "bg-card/60 backdrop-blur-lg border-border/20"
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <img src={seeratyLogo} alt="سيرتي Seeraty" className="h-8" />
           <div className="flex items-center gap-3">
@@ -135,80 +184,108 @@ const Landing = () => {
               <Languages className="w-4 h-4 me-1" />
               {lang === "ar" ? "English" : "عربي"}
             </Button>
-            <Button size="sm" onClick={handleStart} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="sm" onClick={handleStart}>
               {l("Start Free", "ابدأ مجاناً")}
             </Button>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 start-1/4 w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute bottom-0 end-1/4 w-[400px] h-[400px] rounded-full bg-accent/5 blur-3xl" />
-          <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-primary/3 blur-3xl" />
+      {/* ══════════════ HERO ══════════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Background blobs */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-[-10%] start-[10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+          <div className="absolute bottom-[5%] end-[15%] w-[400px] h-[400px] rounded-full bg-accent/8 blur-3xl animate-float-slow-alt" />
+          <div className="absolute top-[30%] start-[50%] w-[600px] h-[350px] rounded-full bg-primary/3 blur-3xl animate-float-slow" style={{ animationDelay: "5s" }} />
+          <div className="absolute top-[60%] end-[5%] w-[300px] h-[300px] rounded-full bg-accent/5 blur-3xl animate-float-slow-alt" style={{ animationDelay: "10s" }} />
+          {/* Dot grid */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: "radial-gradient(circle, hsl(var(--primary) / 0.04) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 pt-16 pb-16">
+        <div className="max-w-6xl mx-auto px-4 py-16 lg:py-0 w-full">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Text Side */}
+            {/* ── Content ── */}
             <div className="text-center lg:text-start">
+              {/* Badge */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, ease: premiumEase }}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6"
+                {...stagger(0, 0.05)}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6 cursor-hover"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                {l("AI-Powered Resume Builder", "منشئ سير ذاتية بالذكاء الاصطناعي")}
+                {l("Powered by Smart AI", "مدعوم بالذكاء الاصطناعي")}
               </motion.div>
 
+              {/* Heading */}
               <motion.h1
-                {...heroReveal(0.15)}
-                className="text-4xl sm:text-5xl md:text-[3.4rem] font-extrabold tracking-tight text-foreground leading-[1.15]"
+                {...stagger(1, 0.05)}
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1]"
               >
                 {l("Build Your CV for", "ابنِ سيرتك لـ")}
                 <br />
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span
+                  className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-shift"
+                  style={{ backgroundSize: "200% auto" }}
+                >
                   <RotatingText
-                    words={lang === "ar"
-                      ? ["وظيفة أحلامك", "منحتك الدراسية", "ترقيتك القادمة", "مشروعك الخاص"]
-                      : ["Your Dream Job", "A Scholarship", "Your Promotion", "A Career Shift"]
+                    words={
+                      lang === "ar"
+                        ? ["وظيفة أحلامك", "التدريب التعاوني", "ترقيتك القادمة", "مشروعك الخاص"]
+                        : ["Your Dream Job", "A COOP Internship", "Your Next Role", "A Career Shift"]
                     }
                   />
                 </span>
               </motion.h1>
 
+              {/* Subtitle */}
               <motion.p
-                {...heroReveal(0.25)}
+                {...stagger(2, 0.05)}
                 className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0"
               >
                 {l(
-                  "Seeraty analyzes your goals, selects the best template, and generates a professional ATS-optimized resume — ready in minutes.",
-                  "سيرتي تحلل أهدافك، تختار القالب الأنسب، وتُنشئ سيرة ذاتية احترافية متوافقة مع أنظمة التوظيف — جاهزة في دقائق."
+                  "Seeraty analyzes your goals and builds a professional ATS-optimized resume — in minutes.",
+                  "سيرتي تحلل أهدافك وتبني سيرة ذاتية احترافية متوافقة مع ATS — في دقائق."
                 )}
               </motion.p>
 
+              {/* CTA Buttons */}
               <motion.div
-                {...heroReveal(0.35)}
+                {...stagger(3, 0.05)}
                 className="mt-8 flex items-center gap-4 flex-wrap justify-center lg:justify-start"
               >
-                <Button size="lg" onClick={handleStart} className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 py-6 rounded-xl shadow-lg shadow-primary/25">
+                <Button
+                  size="lg"
+                  onClick={handleStart}
+                  className="relative overflow-hidden text-base px-8 py-6 rounded-xl shadow-lg shadow-primary/25 cursor-hover"
+                >
                   {l("Build My CV Now", "ابنِ سيرتي الآن")}
                   {isRTL ? <ArrowLeft className="w-5 h-5 ms-2" /> : <ArrowRight className="w-5 h-5 ms-2" />}
+                  {/* Shimmer */}
+                  <span className="absolute inset-0 pointer-events-none">
+                    <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent" />
+                  </span>
                 </Button>
-                <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-xl" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-base px-8 py-6 rounded-xl cursor-hover"
+                  onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
+                >
                   {l("Explore Features", "اكتشف المميزات")}
                   <ChevronDown className="w-4 h-4 ms-1" />
                 </Button>
               </motion.div>
 
-              {/* Stats inline */}
+              {/* Stats Row */}
               <motion.div
-                {...heroReveal(0.5)}
-                className="mt-10 flex items-center gap-6 flex-wrap justify-center lg:justify-start"
+                {...stagger(4, 0.05)}
+                className="mt-10 flex items-center gap-8 flex-wrap justify-center lg:justify-start"
               >
                 {stats.map((s, i) => (
                   <div key={i} className="text-center">
@@ -219,15 +296,48 @@ const Landing = () => {
               </motion.div>
             </div>
 
-            {/* Mockup Side */}
-            <div className="flex justify-center lg:justify-end">
+            {/* ── Visual / Mockup ── */}
+            <motion.div
+              className="flex justify-center lg:justify-end relative"
+              style={{ y: mockupYSmooth }}
+            >
               <ResumeMockup />
-            </div>
+
+              {/* Floating badges */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.4, duration: 0.5, ease: premiumEase }}
+                className="absolute -bottom-2 -start-4 bg-card text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-border/50 animate-badge-float"
+              >
+                PDF + Word
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.6, duration: 0.5, ease: premiumEase }}
+                className="absolute top-1/2 -end-4 bg-card text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-border/50 animate-badge-float"
+                style={{ animationDelay: "1.5s" }}
+              >
+                عربي + English
+              </motion.div>
+            </motion.div>
           </div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2, duration: 0.6 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground/50"
+        >
+          <Mouse className="w-5 h-5 animate-scroll-bounce" />
+          <ChevronDown className="w-4 h-4 animate-scroll-bounce" style={{ animationDelay: "0.2s" }} />
+        </motion.div>
       </section>
 
-      {/* Trusted By — Logo Loop */}
+      {/* ══════════════ TRUSTED BY ══════════════ */}
       <section className="py-10 border-b bg-card/50 overflow-hidden">
         <div className="max-w-5xl mx-auto px-4">
           <motion.p
@@ -241,12 +351,8 @@ const Landing = () => {
           </motion.p>
         </div>
         <div className="relative">
-          {/* Fade edges */}
-          <div className="absolute inset-y-0 start-0 w-20 bg-gradient-to-e from-card/50 to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 end-0 w-20 bg-gradient-to-s from-card/50 to-transparent z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? 'right' : 'left'}, hsl(var(--card) / 0.5), transparent)` }} />
-          <div className="absolute inset-y-0 start-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? 'left' : 'right'}, hsl(var(--card) / 0.5), transparent)` }} />
-
-          {/* Marquee */}
+          <div className="absolute inset-y-0 start-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? "left" : "right"}, hsl(var(--card) / 0.5), transparent)` }} />
+          <div className="absolute inset-y-0 end-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? "right" : "left"}, hsl(var(--card) / 0.5), transparent)` }} />
           <div className="flex animate-marquee gap-16 items-center" style={{ width: "max-content" }}>
             {[...trustedLogos, ...trustedLogos].map((logo, i) => (
               <div key={i} className="flex-shrink-0 opacity-30 hover:opacity-60 transition-opacity duration-500 text-foreground">
@@ -257,12 +363,10 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ══════════════ FEATURES — Stacked Cards ══════════════ */}
       <section id="features" className="py-24" style={{ background: "hsl(var(--muted) / 0.35)" }}>
         <div className="max-w-6xl mx-auto px-4">
-          <motion.div
-            {...sectionReveal}
-            className="text-center mb-6"
-          >
+          <motion.div {...sectionReveal} className="text-center mb-6">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               {l("Everything You Need", "كل ما تحتاجه")}
             </h2>
@@ -274,7 +378,6 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          {/* Stacked Cards Container */}
           <div className="relative max-w-2xl mx-auto pt-8" style={{ paddingBottom: "6rem" }}>
             {features.map((f, i) => {
               const topOffset = 120 + i * 28;
@@ -282,18 +385,14 @@ const Landing = () => {
                 <div
                   key={i}
                   className="sticky"
-                  style={{
-                    top: `${topOffset}px`,
-                    zIndex: i + 1,
-                    marginBottom: i < features.length - 1 ? "48px" : "0",
-                  }}
+                  style={{ top: `${topOffset}px`, zIndex: i + 1, marginBottom: i < features.length - 1 ? "48px" : "0" }}
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 40, scale: 0.97 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.7, ease: smoothDecel }}
-                    className="rounded-[22px] bg-card border border-border/60 px-7 py-7 sm:px-9 sm:py-8 will-change-transform"
+                    className="rounded-[22px] bg-card/90 backdrop-blur-sm border border-border/60 px-7 py-7 sm:px-9 sm:py-8 will-change-transform"
                     style={{
                       boxShadow: `0 ${8 + i * 2}px ${20 + i * 6}px -${4 + i}px hsl(var(--primary) / ${0.06 + i * 0.01}), 0 2px 6px -2px hsl(var(--foreground) / 0.04)`,
                     }}
@@ -301,9 +400,7 @@ const Landing = () => {
                     <div className="flex items-start gap-5">
                       <div
                         className="w-13 h-13 min-w-[3.25rem] rounded-2xl flex items-center justify-center"
-                        style={{
-                          background: `linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.10))`,
-                        }}
+                        style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--accent) / 0.10))" }}
                       >
                         <f.icon className="w-6 h-6 text-primary" />
                       </div>
@@ -327,22 +424,22 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Templates Showcase */}
+      {/* ══════════════ TEMPLATES ══════════════ */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
+        <div className="max-w-5xl mx-auto px-4">
+          <motion.div {...sectionReveal} className="text-center mb-14">
             <h2 className="text-3xl font-bold text-foreground">
-              {l("Premium Templates", "قوالب احترافية")}
+              {l("Smart Templates", "قوالب ذكية")}
             </h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
               {l(
-                "Choose from our collection of professionally designed templates",
-                "اختر من مجموعتنا من القوالب المصممة باحترافية"
+                "Each template is designed for a specific career stage",
+                "كل قالب مصمم لمرحلة مهنية مختلفة"
               )}
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.map((t, i) => (
               <motion.div
                 key={t.id}
@@ -351,13 +448,11 @@ const Landing = () => {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-30px" }}
                 variants={fadeUp}
-                className="group relative rounded-2xl border bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer will-change-transform hover:-translate-y-1"
+                className="group relative rounded-2xl border bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] cursor-hover will-change-transform hover:-translate-y-1"
                 onClick={handleStart}
               >
-                {/* Template preview mock */}
                 <div className="aspect-[3/4] relative p-4">
                   <div className="w-full h-full rounded-lg border bg-background p-3 flex flex-col gap-2">
-                    {/* Header bar */}
                     <div className="h-3 rounded-full w-2/3" style={{ backgroundColor: t.color }} />
                     <div className="h-2 rounded-full bg-muted w-1/2" />
                     <div className="mt-2 h-1.5 rounded-full bg-muted/60 w-full" />
@@ -370,7 +465,6 @@ const Landing = () => {
                     <div className="h-1.5 rounded-full bg-muted/60 w-full" />
                     <div className="h-1.5 rounded-full bg-muted/60 w-3/4" />
                   </div>
-                  {/* Hover overlay */}
                   <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-2xl flex items-center justify-center">
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium shadow-lg">
                       {l("Use Template", "استخدم القالب")}
@@ -387,66 +481,49 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* How it Works */}
+      {/* ══════════════ HOW IT WORKS ══════════════ */}
       <section className="py-20 bg-muted/30">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-14">
+          <motion.div {...sectionReveal} className="text-center mb-14">
             <h2 className="text-3xl font-bold text-foreground">
               {l("How It Works", "كيف تعمل؟")}
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="space-y-8">
-            {[
-              {
-                step: "1",
-                titleAr: "أجب على الاستبيان",
-                titleEn: "Answer the Survey",
-                descAr: "حدد خبرتك وتخصصك وهدفك الوظيفي في ٣٠ ثانية",
-                descEn: "Define your experience, field, and career goal in 30 seconds",
-              },
-              {
-                step: "2",
-                titleAr: "نُعد سيرتك تلقائياً",
-                titleEn: "We Auto-Setup Your CV",
-                descAr: "نختار القالب الأنسب ونرتب الأقسام ونملأ المحتوى المبدئي",
-                descEn: "We pick the best template, arrange sections, and fill initial content",
-              },
-              {
-                step: "3",
-                titleAr: "عدّل وحمّل",
-                titleEn: "Edit & Download",
-                descAr: "خصّص سيرتك بالتعديل المباشر ثم حمّلها PDF أو Word",
-                descEn: "Customize with live editing, then download as PDF or Word",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                className="flex items-start gap-5"
-              >
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold shadow-lg shadow-primary/20">
-                  {item.step}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {lang === "ar" ? item.titleAr : item.titleEn}
-                  </h3>
-                  <p className="text-muted-foreground mt-1">
-                    {lang === "ar" ? item.descAr : item.descEn}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="relative">
+            {/* Connecting line */}
+            <div className="absolute start-6 top-0 bottom-0 w-px bg-border/60 hidden sm:block" style={{ transform: "translateX(-50%)" }} />
+
+            <div className="space-y-8">
+              {steps.map((item, i) => (
+                <motion.div
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="flex items-start gap-5 relative"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold shadow-lg shadow-primary/20 relative z-10">
+                    {item.step}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {lang === "ar" ? item.titleAr : item.titleEn}
+                    </h3>
+                    <p className="text-muted-foreground mt-1">
+                      {lang === "ar" ? item.descAr : item.descEn}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ══════════════ CTA ══════════════ */}
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.div
@@ -469,7 +546,7 @@ const Landing = () => {
               <Button
                 size="lg"
                 onClick={handleStart}
-                className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90 text-base px-10 py-6 rounded-xl shadow-lg shadow-primary/25"
+                className="mt-8 text-base px-10 py-6 rounded-xl shadow-lg shadow-primary/25 cursor-hover"
               >
                 {l("Start Building — It's Free", "ابدأ الآن — مجاناً")}
                 {isRTL ? <ArrowLeft className="w-5 h-5 ms-2" /> : <ArrowRight className="w-5 h-5 ms-2" />}
@@ -479,7 +556,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ══════════════ FOOTER ══════════════ */}
       <footer className="border-t bg-card py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -489,7 +566,7 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => setLang(lang === "ar" ? "en" : "ar")} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <button onClick={() => setLang(lang === "ar" ? "en" : "ar")} className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-hover">
               {lang === "ar" ? "English" : "عربي"}
             </button>
           </div>
