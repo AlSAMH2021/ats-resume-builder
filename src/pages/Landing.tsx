@@ -345,11 +345,11 @@ const Landing = () => {
             {l("Trusted by professionals at", "يثق بنا محترفون في")}
           </motion.p>
         </div>
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <div className="absolute inset-y-0 start-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? "left" : "right"}, hsl(var(--card) / 0.5), transparent)` }} />
           <div className="absolute inset-y-0 end-0 w-20 z-10 pointer-events-none" style={{ background: `linear-gradient(to ${isRTL ? "right" : "left"}, hsl(var(--card) / 0.5), transparent)` }} />
-          <div className="flex animate-marquee gap-16 items-center" style={{ width: "max-content" }}>
-            {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+          <div className="flex gap-16 items-center animate-marquee" style={{ width: "max-content" }}>
+            {[...trustedLogos, ...trustedLogos, ...trustedLogos, ...trustedLogos].map((logo, i) => (
               <div key={i} className="flex-shrink-0 opacity-30 hover:opacity-60 transition-opacity duration-500 text-foreground">
                 {logo}
               </div>
