@@ -169,7 +169,7 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto px-4 pt-16 pb-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Text Side */}
-            <div className={`text-center lg:text-start ${isRTL ? "lg:order-1" : ""}`}>
+            <div className="text-center lg:text-start">
               <motion.div
                 initial={{ opacity: 0, scale: 0.92 }}
                 animate={{ opacity: 1, scale: 1 }}
