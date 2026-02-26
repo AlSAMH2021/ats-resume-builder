@@ -228,7 +228,7 @@ const Landing = () => {
                 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-foreground leading-[1.15]"
               >
                 {l("Your Resume,", "سيرتك الذاتية،")}
-                <br />
+                <span className="block mt-3" />
                 <RotatingText
                   words={
                     lang === "ar"
