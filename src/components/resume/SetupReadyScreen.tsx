@@ -12,13 +12,9 @@ interface Props {
 }
 
 const templateNames: Record<string, { en: string; ar: string }> = {
-  starter: { en: "Starter", ar: "المبتدئ" },
-  academic: { en: "Academic", ar: "أكاديمي" },
-  professional: { en: "Professional", ar: "احترافي" },
-  classic: { en: "Classic ATS", ar: "كلاسيكي ATS" },
-  modern: { en: "Modern", ar: "عصري" },
-  minimal: { en: "Minimal", ar: "بسيط" },
-  executive: { en: "Executive", ar: "تنفيذي" },
+  starter: { en: "Starter", ar: "البداية" },
+  academic: { en: "Academic", ar: "الأكاديمي" },
+  professional: { en: "Professional", ar: "المهني" },
 };
 
 export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {

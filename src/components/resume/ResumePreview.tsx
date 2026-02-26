@@ -1,7 +1,7 @@
 import type { ResumeData } from "@/types/resume";
 import type { ResumeTemplate } from "./TemplateSelector";
 import type { ResumeColors } from "./ColorCustomizer";
-import { defaultResumeColors } from "./ColorCustomizer";
+import { defaultResumeColors, seeratyOverlayColors } from "./ColorCustomizer";
 import type { ResumeSection } from "./SectionReorder";
 import { defaultSectionOrder } from "./SectionReorder";
 
@@ -11,12 +11,14 @@ interface Props {
   template?: ResumeTemplate;
   colors?: ResumeColors;
   sectionOrder?: ResumeSection[];
+  seeratyOverlay?: boolean;
 }
 
 const l = (lang: string, en: string, ar: string) => lang === 'ar' ? ar : en;
 
-export default function ResumePreview({ data, lang, template = "classic", colors, sectionOrder }: Props) {
-  const c = colors || defaultResumeColors;
+export default function ResumePreview({ data, lang, template = "starter", colors, sectionOrder, seeratyOverlay = false }: Props) {
+  const baseColors = colors || defaultResumeColors;
+  const c = seeratyOverlay ? seeratyOverlayColors : baseColors;
   const order = sectionOrder || defaultSectionOrder;
   const hasContent = (val: string | undefined) => val && val.trim().length > 0;
   const contactParts = [data.location, data.phone, data.email, data.linkedin, data.website].filter(Boolean);
@@ -100,10 +102,13 @@ export default function ResumePreview({ data, lang, template = "classic", colors
     ) : null,
   };
 
-  // Seeraty signature template — unique branded layout
-  if (template === "seeraty") {
+  const templateClass = `resume-${template}`;
+  const overlayClass = seeratyOverlay ? "seeraty-overlay" : "";
+
+  // Seeraty overlay wraps any template with branded header + accent bar + watermark
+  if (seeratyOverlay) {
     return (
-      <div className="resume-preview resume-seeraty" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className={`resume-preview ${templateClass} ${overlayClass}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         {/* Purple accent bar */}
         <div className="seeraty-accent-bar" style={{ background: `linear-gradient(135deg, ${c.headingColor}, ${c.lineColor})` }} />
 
@@ -142,7 +147,7 @@ export default function ResumePreview({ data, lang, template = "classic", colors
   }
 
   return (
-    <div className={`resume-preview resume-${template}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`resume-preview ${templateClass}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
       {hasContent(data.jobTitle) && <p style={{ fontSize: '12pt', marginBottom: '4pt' }}>{data.jobTitle}</p>}
       {contactParts.length > 0 && <p className="contact-line">{contactParts.join("  |  ")}</p>}

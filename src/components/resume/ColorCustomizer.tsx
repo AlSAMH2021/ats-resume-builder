@@ -7,19 +7,19 @@ export interface ResumeColors {
 }
 
 export const defaultResumeColors: ResumeColors = {
-  headingColor: "#1a1a1a",
-  lineColor: "#1a1a1a",
+  headingColor: "#2a7a8c",
+  lineColor: "#2a7a8c",
+};
+
+export const seeratyOverlayColors: ResumeColors = {
+  headingColor: "#7c3aed",
+  lineColor: "#a78bfa",
 };
 
 export const templateDefaultColors: Record<string, ResumeColors> = {
-  classic: { headingColor: "#1a1a1a", lineColor: "#1a1a1a" },
-  modern: { headingColor: "#2a7a8c", lineColor: "#2a7a8c" },
-  minimal: { headingColor: "#555555", lineColor: "#999999" },
-  executive: { headingColor: "#6d28d9", lineColor: "#8b5cf6" },
-  seeraty: { headingColor: "#7c3aed", lineColor: "#a78bfa" },
-  starter: { headingColor: "#1e3a5f", lineColor: "#1e3a5f" },
-  academic: { headingColor: "#2a7a8c", lineColor: "#2a7a8c" },
-  professional: { headingColor: "#1a1a1a", lineColor: "#1a1a1a" },
+  starter: { headingColor: "#2a7a8c", lineColor: "#2a7a8c" },
+  academic: { headingColor: "#1a1a1a", lineColor: "#1a1a1a" },
+  professional: { headingColor: "#1e293b", lineColor: "#1e293b" },
 };
 
 const presets = [

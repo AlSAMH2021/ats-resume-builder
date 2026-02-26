@@ -10,7 +10,7 @@ import ResumePreview from "@/components/resume/ResumePreview";
 import TargetChecklist from "@/components/resume/TargetChecklist";
 import type { SectionProgress } from "@/lib/careerTargets";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
-import ColorCustomizer, { type ResumeColors, templateDefaultColors } from "@/components/resume/ColorCustomizer";
+import ColorCustomizer, { type ResumeColors, templateDefaultColors, seeratyOverlayColors } from "@/components/resume/ColorCustomizer";
 import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
 import OnboardingQuiz, { type OnboardingTargets } from "@/components/resume/OnboardingQuiz";
 import SetupReadyScreen from "@/components/resume/SetupReadyScreen";
@@ -51,6 +51,7 @@ const Index = () => {
   });
   const [showTargets, setShowTargets] = useState(false);
   const [sectionProgress, setSectionProgress] = useState<SectionProgress[]>([]);
+  const [seeratyOverlay, setSeeratyOverlay] = useState(false);
 
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
     setTemplate(t);
@@ -250,7 +251,7 @@ const Index = () => {
           {/* Left: Form */}
           <ScrollArea className="h-[calc(100vh-57px)] border-e" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-5" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <TemplateSelector value={template} onChange={handleTemplateChange} lang={lang} />
+              <TemplateSelector value={template} onChange={handleTemplateChange} lang={lang} seeratyOverlay={seeratyOverlay} onSeeratyOverlayChange={setSeeratyOverlay} />
               <div className="mt-3">
                 <ColorCustomizer value={colors} onChange={setColors} lang={lang} />
               </div>
@@ -280,7 +281,7 @@ const Index = () => {
           {/* Right: Preview */}
           <div className="h-[calc(100vh-57px)] overflow-auto bg-muted/50 p-6 flex justify-center">
             <div className="bg-white shadow-lg border w-full max-w-[210mm] min-h-[297mm] p-[15mm] rounded-sm">
-              <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} sectionOrder={sectionOrder} />
+              <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
             </div>
           </div>
         </div>
@@ -288,7 +289,7 @@ const Index = () => {
 
       {/* Print-only preview */}
       <div className="hidden print-only">
-        <ResumePreview data={watchedData} lang={lang} template={template} colors={colors} sectionOrder={sectionOrder} />
+        <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
       </div>
     </div>
   );
