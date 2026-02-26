@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2 } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
+import TargetChecklist from "@/components/resume/TargetChecklist";
+import type { SectionProgress } from "@/lib/careerTargets";
 import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
 import ColorCustomizer, { type ResumeColors, templateDefaultColors } from "@/components/resume/ColorCustomizer";
 import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
@@ -48,6 +50,7 @@ const Index = () => {
     } catch { return null; }
   });
   const [showTargets, setShowTargets] = useState(false);
+  const [sectionProgress, setSectionProgress] = useState<SectionProgress[]>([]);
 
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
     setTemplate(t);
@@ -254,8 +257,18 @@ const Index = () => {
               <div className="mt-3">
                 <SectionReorder order={sectionOrder} onChange={setSectionOrder} lang={lang} />
               </div>
+              {/* Target Checklist Widget */}
+              {targets && sectionProgress.length > 0 && (
+                <div className="mt-4">
+                  <TargetChecklist sections={sectionProgress} lang={lang} />
+                </div>
+              )}
               <div className="mt-4">
-                <ResumeForm lang={lang} />
+                <ResumeForm
+                  lang={lang}
+                  persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                  onProgressUpdate={setSectionProgress}
+                />
               </div>
             </div>
           </ScrollArea>
