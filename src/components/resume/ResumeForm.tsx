@@ -11,16 +11,24 @@ import ProjectsSection from "./ProjectsSection";
 import ATSKeywordsSection from "./ATSKeywordsSection";
 import SectionProgressBar from "./SectionProgressBar";
 import { Separator } from "@/components/ui/separator";
-import { computeSectionProgress, type SectionProgress } from "@/lib/careerTargets";
+import { computeSectionProgress, getNextPrioritySection, type SectionProgress } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
+
+interface NextPriority {
+  sectionKey: string;
+  labelEn: string;
+  labelAr: string;
+  gainPercent: number;
+}
 
 interface Props {
   lang: "en" | "ar";
   persona?: { stage: string; industry: string; goal: string } | null;
   onProgressUpdate?: (sections: SectionProgress[]) => void;
+  onNextPriorityUpdate?: (priority: NextPriority | null) => void;
 }
 
-export default function ResumeForm({ lang, persona, onProgressUpdate }: Props) {
+export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPriorityUpdate }: Props) {
   const { watch } = useFormContext<ResumeData>();
   const data = watch();
   const onProgressRef = useRef(onProgressUpdate);
@@ -54,11 +62,29 @@ export default function ResumeForm({ lang, persona, onProgressUpdate }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataKey, persona]);
 
+  const onNextPriorityRef = useRef(onNextPriorityUpdate);
+  onNextPriorityRef.current = onNextPriorityUpdate;
+
   useEffect(() => {
     if (sections.length > 0) {
       onProgressRef.current?.(sections);
+      if (persona) {
+        const next = getNextPrioritySection(sections, persona.stage, persona.goal);
+        if (next) {
+          const overall = sections.reduce((s, sec) => s + sec.percent, 0) / sections.length;
+          const gain = Math.round(((100 - next.percent) * 100) / (sections.length * 100));
+          onNextPriorityRef.current?.({
+            sectionKey: next.sectionKey,
+            labelEn: next.labelEn,
+            labelAr: next.labelAr,
+            gainPercent: Math.max(gain, 1),
+          });
+        } else {
+          onNextPriorityRef.current?.(null);
+        }
+      }
     }
-  }, [sections]);
+  }, [sections, persona]);
 
   const getProgress = (key: string) =>
     sections.find((s) => s.sectionKey === key);
