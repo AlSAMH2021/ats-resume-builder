@@ -89,8 +89,9 @@ const Index = () => {
     setLang(t.language as 'en' | 'ar');
     localStorage.setItem(ONBOARDING_KEY, "true");
     localStorage.setItem(TARGETS_KEY, JSON.stringify(t));
+    // Save persona/stage for downstream use
+    localStorage.setItem("seeraty-persona", t.stage);
     setShowOnboarding(false);
-    // Generate smart setup and show the ready screen
     const setup = generateSmartSetup(t);
     setSmartSetup(setup);
   }, []);
@@ -222,7 +223,7 @@ const Index = () => {
         <div className="no-print border-b bg-primary/5 px-4 py-3">
           <div className="max-w-[1600px] mx-auto flex items-center gap-4 flex-wrap">
             <span className="text-sm font-semibold text-primary">{l("Your Targets:", "مستهدفاتك:")}</span>
-            <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.experienceLevel}</span>
+            <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.stage}</span>
             <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.industry}</span>
             <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.goal}</span>
             <Button

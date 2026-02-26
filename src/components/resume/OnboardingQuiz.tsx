@@ -6,14 +6,14 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Pencil, Sparkles } from "lucide-re
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
 export interface OnboardingTargets {
-  experienceLevel: string;
+  stage: string;       // freshman | student | graduate
   industry: string;
   goal: string;
   language: string;
 }
 
 const defaultTargets: OnboardingTargets = {
-  experienceLevel: "",
+  stage: "",
   industry: "",
   goal: "",
   language: "ar",
@@ -27,27 +27,26 @@ interface Props {
 
 const questions = [
   {
-    key: "experienceLevel" as const,
-    titleEn: "What is your experience level?",
-    titleAr: "ما هو مستوى خبرتك؟",
+    key: "stage" as const,
+    titleEn: "What stage are you at?",
+    titleAr: "في أي مرحلة أنت؟",
     options: [
-      { value: "fresh", labelEn: "Fresh Graduate", labelAr: "خريج جديد", icon: "🎓" },
-      { value: "junior", labelEn: "1-3 Years", labelAr: "١-٣ سنوات", icon: "🌱" },
-      { value: "mid", labelEn: "3-7 Years", labelAr: "٣-٧ سنوات", icon: "💼" },
-      { value: "senior", labelEn: "7+ Years", labelAr: "+٧ سنوات", icon: "🏆" },
+      { value: "freshman", labelEn: "Freshman", labelAr: "طالب مستجد", icon: "🎒" },
+      { value: "student", labelEn: "University Student", labelAr: "طالب جامعي", icon: "🎓" },
+      { value: "graduate", labelEn: "Recent Graduate", labelAr: "خريج حديث", icon: "🚀" },
     ],
   },
   {
     key: "industry" as const,
-    titleEn: "What industry are you targeting?",
-    titleAr: "ما المجال الذي تستهدفه؟",
+    titleEn: "What is your field of study?",
+    titleAr: "ما تخصصك الدراسي؟",
     options: [
-      { value: "tech", labelEn: "Technology", labelAr: "تقنية المعلومات", icon: "💻" },
+      { value: "tech", labelEn: "IT & Computing", labelAr: "تقنية معلومات", icon: "💻" },
       { value: "business", labelEn: "Business & Finance", labelAr: "أعمال ومالية", icon: "📊" },
-      { value: "healthcare", labelEn: "Healthcare", labelAr: "صحة وطب", icon: "🏥" },
       { value: "engineering", labelEn: "Engineering", labelAr: "هندسة", icon: "⚙️" },
-      { value: "education", labelEn: "Education", labelAr: "تعليم", icon: "📚" },
-      { value: "creative", labelEn: "Creative & Design", labelAr: "إبداع وتصميم", icon: "🎨" },
+      { value: "healthcare", labelEn: "Health Sciences", labelAr: "علوم صحية", icon: "🏥" },
+      { value: "creative", labelEn: "Design & Arts", labelAr: "تصميم وفنون", icon: "🎨" },
+      { value: "law", labelEn: "Law", labelAr: "قانون", icon: "⚖️" },
       { value: "other", labelEn: "Other", labelAr: "أخرى", icon: "🌍" },
     ],
   },
@@ -56,10 +55,10 @@ const questions = [
     titleEn: "What is your main goal?",
     titleAr: "ما هدفك الرئيسي؟",
     options: [
-      { value: "first-job", labelEn: "Land my first job", labelAr: "الحصول على وظيفتي الأولى", icon: "🚀" },
-      { value: "career-change", labelEn: "Change career", labelAr: "تغيير المسار المهني", icon: "🔄" },
-      { value: "promotion", labelEn: "Get a promotion", labelAr: "الحصول على ترقية", icon: "📈" },
-      { value: "freelance", labelEn: "Freelance / Remote", labelAr: "عمل حر / عن بُعد", icon: "🏠" },
+      { value: "volunteering", labelEn: "Volunteering / Clubs", labelAr: "تطوع / أندية", icon: "🤝" },
+      { value: "internship", labelEn: "Internship (Co-op)", labelAr: "تدريب تعاوني", icon: "🏢" },
+      { value: "part-time", labelEn: "Part-time Job", labelAr: "عمل جزئي", icon: "⏰" },
+      { value: "full-time", labelEn: "First Full-time Job", labelAr: "وظيفتي الأولى", icon: "🚀" },
     ],
   },
   {
@@ -171,7 +170,7 @@ export default function OnboardingQuiz({ lang, onComplete, onSkip }: Props) {
         </div>
 
         {/* Options */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className={cn("grid gap-3", currentQ.options.length <= 3 ? "grid-cols-1" : "grid-cols-2")}>
           {currentQ.options.map((opt) => (
             <button
               key={opt.value}
