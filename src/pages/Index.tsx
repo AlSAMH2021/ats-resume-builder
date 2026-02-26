@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2 } from "lucide-react";
+import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2, Home } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TargetChecklist from "@/components/resume/TargetChecklist";
@@ -56,6 +57,7 @@ function loadSavedTemplate(): ResumeTemplate {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [lang, setLang] = useState<'en' | 'ar'>('ar');
   const [template, setTemplate] = useState<ResumeTemplate>(loadSavedTemplate);
   const [colors, setColors] = useState<ResumeColors>(() => templateDefaultColors[loadSavedTemplate()] ?? templateDefaultColors.starter);
@@ -205,6 +207,9 @@ const Index = () => {
       <header className="no-print border-b bg-card sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1.5">
+              <Home className="w-4 h-4" />
+            </Button>
             <img src={seeratyLogo} alt="سيرتي Seeraty" className="h-8" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
