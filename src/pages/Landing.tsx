@@ -9,12 +9,29 @@ import {
 } from "lucide-react";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
+// Premium easing curves — landing page only
+const premiumEase = [0.22, 1, 0.36, 1] as const;
+const smoothDecel = [0.16, 1, 0.3, 1] as const;
+
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" as const }
+    transition: { delay: i * 0.12, duration: 0.45, ease: premiumEase }
   }),
+};
+
+const heroReveal = (delay: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.7, delay, ease: premiumEase },
+});
+
+const sectionReveal = {
+  initial: { opacity: 0, y: 22 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" } as const,
+  transition: { duration: 0.65, ease: premiumEase },
 };
 
 const features = [
@@ -148,9 +165,9 @@ const Landing = () => {
 
         <div className="max-w-5xl mx-auto px-4 pt-20 pb-16 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6, ease: premiumEase }}
             className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6"
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -158,9 +175,7 @@ const Landing = () => {
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            {...heroReveal(0.15)}
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-tight"
           >
             {l("Build Your Perfect CV", "ابنِ سيرتك الذاتية")}
@@ -171,9 +186,7 @@ const Landing = () => {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            {...heroReveal(0.25)}
             className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto"
           >
             {l(
@@ -183,9 +196,7 @@ const Landing = () => {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            {...heroReveal(0.35)}
             className="mt-8 flex items-center justify-center gap-4 flex-wrap"
           >
             <Button size="lg" onClick={handleStart} className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 py-6 rounded-xl shadow-lg shadow-primary/25">
@@ -200,9 +211,7 @@ const Landing = () => {
 
           {/* Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            {...heroReveal(0.5)}
             className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto"
           >
             {stats.map((s, i) => (
@@ -219,10 +228,7 @@ const Landing = () => {
       <section id="features" className="py-24" style={{ background: "hsl(var(--muted) / 0.35)" }}>
         <div className="max-w-6xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" as const }}
+            {...sectionReveal}
             className="text-center mb-6"
           >
             <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
@@ -251,11 +257,11 @@ const Landing = () => {
                   }}
                 >
                   <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.92 }}
+                    initial={{ opacity: 0, y: 40, scale: 0.97 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="rounded-[22px] bg-card border border-border/60 px-7 py-7 sm:px-9 sm:py-8"
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.7, ease: smoothDecel }}
+                    className="rounded-[22px] bg-card border border-border/60 px-7 py-7 sm:px-9 sm:py-8 will-change-transform"
                     style={{
                       boxShadow: `0 ${8 + i * 2}px ${20 + i * 6}px -${4 + i}px hsl(var(--primary) / ${0.06 + i * 0.01}), 0 2px 6px -2px hsl(var(--foreground) / 0.04)`,
                     }}
@@ -313,7 +319,7 @@ const Landing = () => {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-30px" }}
                 variants={fadeUp}
-                className="group relative rounded-2xl border bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 cursor-pointer"
+                className="group relative rounded-2xl border bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer will-change-transform hover:-translate-y-1"
                 onClick={handleStart}
               >
                 {/* Template preview mock */}
@@ -412,10 +418,10 @@ const Landing = () => {
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.7, ease: premiumEase }}
           >
             <div className="rounded-3xl bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10 border border-primary/10 p-12">
               <Star className="w-10 h-10 text-primary mx-auto mb-4" />
