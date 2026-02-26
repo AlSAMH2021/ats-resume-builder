@@ -25,6 +25,19 @@ import seeratyLogo from "@/assets/seeraty_logo.png";
 const STORAGE_KEY = "ats-resume-data";
 const ONBOARDING_KEY = "seeraty-onboarding-done";
 const TARGETS_KEY = "seeraty-targets";
+const TEMPLATE_KEY = "seeraty-template";
+
+// Migration: map old template names to new archetypes
+const migrateTemplate = (t: string): ResumeTemplate => {
+  const map: Record<string, ResumeTemplate> = {
+    classic: "academic",
+    modern: "starter",
+    minimal: "academic",
+    executive: "professional",
+    seeraty: "starter",
+  };
+  return map[t] ?? (["starter", "academic", "professional"].includes(t) ? t as ResumeTemplate : "starter");
+};
 
 function loadSavedData(): ResumeData {
   try {
@@ -34,10 +47,18 @@ function loadSavedData(): ResumeData {
   return defaultResumeData;
 }
 
+function loadSavedTemplate(): ResumeTemplate {
+  try {
+    const saved = localStorage.getItem(TEMPLATE_KEY);
+    if (saved) return migrateTemplate(saved);
+  } catch {}
+  return "starter";
+}
+
 const Index = () => {
   const [lang, setLang] = useState<'en' | 'ar'>('ar');
-  const [template, setTemplate] = useState<ResumeTemplate>('starter');
-  const [colors, setColors] = useState<ResumeColors>(templateDefaultColors.starter);
+  const [template, setTemplate] = useState<ResumeTemplate>(loadSavedTemplate);
+  const [colors, setColors] = useState<ResumeColors>(() => templateDefaultColors[loadSavedTemplate()] ?? templateDefaultColors.starter);
   const [sectionOrder, setSectionOrder] = useState<ResumeSection[]>(defaultSectionOrder);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem(ONBOARDING_KEY);
@@ -57,6 +78,7 @@ const Index = () => {
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
     setTemplate(t);
     setColors(templateDefaultColors[t]);
+    localStorage.setItem(TEMPLATE_KEY, t);
   }, []);
 
   const form = useForm<ResumeData>({
