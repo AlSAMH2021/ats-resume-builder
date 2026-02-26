@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import PersonalInfoSection from "./PersonalInfoSection";
 import SummarySection from "./SummarySection";
@@ -20,27 +20,45 @@ interface Props {
   onProgressUpdate?: (sections: SectionProgress[]) => void;
 }
 
-const sectionKeyMap: Record<string, string> = {
-  PersonalInfoSection: "personal",
-  SummarySection: "summary",
-  ExperienceSection: "experience",
-  EducationSection: "education",
-  CertificationsSection: "certifications",
-  SkillsSection: "skills",
-  LanguagesSection: "languages",
-  ProjectsSection: "projects",
-};
-
 export default function ResumeForm({ lang, persona, onProgressUpdate }: Props) {
   const { watch } = useFormContext<ResumeData>();
   const data = watch();
+  const onProgressRef = useRef(onProgressUpdate);
+  onProgressRef.current = onProgressUpdate;
+
+  // Stabilise by serialising only the fields that matter
+  const dataKey = useMemo(() => {
+    if (!persona) return "";
+    return JSON.stringify({
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      summary: data.summary,
+      skills: data.skills,
+      educationCount: data.education?.length ?? 0,
+      educationDesc: data.education?.map((e) => e.description + e.institution).join("|"),
+      expCount: data.experiences?.length ?? 0,
+      expText: data.experiences?.map((e) => e.company + e.jobTitle + e.bullets).join("|"),
+      projCount: data.projects?.length ?? 0,
+      projText: data.projects?.map((p) => p.name + p.description).join("|"),
+      langCount: data.languages?.length ?? 0,
+      langText: data.languages?.map((l) => l.name).join("|"),
+      certCount: data.certifications?.length ?? 0,
+      certText: data.certifications?.map((c) => c.name).join("|"),
+    });
+  }, [data, persona]);
 
   const sections = useMemo(() => {
-    if (!persona) return [];
-    const result = computeSectionProgress(data, persona);
-    onProgressUpdate?.(result);
-    return result;
-  }, [data, persona]);
+    if (!persona || !dataKey) return [];
+    return computeSectionProgress(data, persona);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataKey, persona]);
+
+  useEffect(() => {
+    if (sections.length > 0) {
+      onProgressRef.current?.(sections);
+    }
+  }, [sections]);
 
   const getProgress = (key: string) =>
     sections.find((s) => s.sectionKey === key);
