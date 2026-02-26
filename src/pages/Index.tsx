@@ -51,6 +51,7 @@ const Index = () => {
   });
   const [showTargets, setShowTargets] = useState(false);
   const [sectionProgress, setSectionProgress] = useState<SectionProgress[]>([]);
+  const [nextPriority, setNextPriority] = useState<{ sectionKey: string; labelEn: string; labelAr: string; gainPercent: number } | null>(null);
   const [seeratyOverlay, setSeeratyOverlay] = useState(false);
 
   const handleTemplateChange = useCallback((t: ResumeTemplate) => {
@@ -265,6 +266,7 @@ const Index = () => {
                     sections={sectionProgress}
                     lang={lang}
                     persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                    nextPriority={nextPriority}
                   />
                 </div>
               )}
@@ -273,6 +275,7 @@ const Index = () => {
                   lang={lang}
                   persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
                   onProgressUpdate={setSectionProgress}
+                  onNextPriorityUpdate={setNextPriority}
                 />
               </div>
             </div>
