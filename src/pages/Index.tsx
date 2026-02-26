@@ -36,8 +36,8 @@ function loadSavedData(): ResumeData {
 
 const Index = () => {
   const [lang, setLang] = useState<'en' | 'ar'>('ar');
-  const [template, setTemplate] = useState<ResumeTemplate>('classic');
-  const [colors, setColors] = useState<ResumeColors>(templateDefaultColors.classic);
+  const [template, setTemplate] = useState<ResumeTemplate>('starter');
+  const [colors, setColors] = useState<ResumeColors>(templateDefaultColors.starter);
   const [sectionOrder, setSectionOrder] = useState<ResumeSection[]>(defaultSectionOrder);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem(ONBOARDING_KEY);
@@ -102,9 +102,9 @@ const Index = () => {
   const handleSetupOpen = useCallback(() => {
     if (!smartSetup) return;
     // Apply template, section order, colors, and pre-filled data
-    setTemplate(smartSetup.template);
-    setColors(templateDefaultColors[smartSetup.template]);
-    setSectionOrder(smartSetup.sectionOrder);
+    setTemplate(smartSetup.template as ResumeTemplate);
+    setColors(templateDefaultColors[smartSetup.template] ?? templateDefaultColors.starter);
+    setSectionOrder(smartSetup.sectionOrder as ResumeSection[]);
     form.reset(smartSetup.prefilled);
     setSmartSetup(null);
     toast.success(lang === 'ar' ? "تم إعداد سيرتك الذاتية — ابدأ التعديل!" : "Your CV is ready — start editing!");
@@ -260,7 +260,11 @@ const Index = () => {
               {/* Target Checklist Widget */}
               {targets && sectionProgress.length > 0 && (
                 <div className="mt-4">
-                  <TargetChecklist sections={sectionProgress} lang={lang} />
+                  <TargetChecklist
+                    sections={sectionProgress}
+                    lang={lang}
+                    persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                  />
                 </div>
               )}
               <div className="mt-4">

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown, GripVertical } from "lucide-react";
 
 export type ResumeSection =
+  | "personal"
   | "summary"
   | "experience"
   | "education"
@@ -12,6 +13,7 @@ export type ResumeSection =
   | "projects";
 
 export const defaultSectionOrder: ResumeSection[] = [
+  "personal",
   "summary",
   "experience",
   "education",
@@ -22,6 +24,7 @@ export const defaultSectionOrder: ResumeSection[] = [
 ];
 
 const sectionLabels: Record<ResumeSection, { en: string; ar: string }> = {
+  personal: { en: "Personal Info", ar: "المعلومات الشخصية" },
   summary: { en: "Summary", ar: "الملخص المهني" },
   experience: { en: "Experience", ar: "الخبرات" },
   education: { en: "Education", ar: "التعليم" },
@@ -65,8 +68,8 @@ export default function SectionReorder({ order, onChange, lang }: Props) {
             <GripVertical className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <span className="flex-1">
               {lang === "ar"
-                ? sectionLabels[section].ar
-                : sectionLabels[section].en}
+                ? sectionLabels[section]?.ar ?? section
+                : sectionLabels[section]?.en ?? section}
             </span>
             <Button
               type="button"

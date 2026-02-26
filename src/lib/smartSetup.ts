@@ -1,77 +1,38 @@
 import type { OnboardingTargets } from "@/components/resume/OnboardingQuiz";
 import type { ResumeData } from "@/types/resume";
-import type { ResumeTemplate } from "@/components/resume/TemplateSelector";
-import type { ResumeSection } from "@/components/resume/SectionReorder";
+import {
+  selectTemplate,
+  getSectionOrder,
+  PERSONA_CONFIG,
+  FIELD_CONFIG,
+  GOAL_CONFIG,
+  type TemplateName,
+  type SectionKey,
+} from "@/lib/personaEngine";
 
 export interface SmartSetupResult {
-  template: ResumeTemplate;
+  template: TemplateName;
   templateReasonEn: string;
   templateReasonAr: string;
   strengthsEn: string[];
   strengthsAr: string[];
-  sectionOrder: ResumeSection[];
+  sectionOrder: SectionKey[];
   prefilled: ResumeData;
 }
 
 // ── Template selection ──
-function pickTemplate(t: OnboardingTargets): { template: ResumeTemplate; reasonEn: string; reasonAr: string } {
-  if (t.stage === "graduate") {
-    return {
-      template: "classic",
-      reasonEn: "Classic ATS-friendly template — ideal for professional job applications",
-      reasonAr: "القالب الكلاسيكي المتوافق مع ATS — مثالي للتقديم على الوظائف",
-    };
-  }
-  // Students & freshmen → Modern
-  return {
-    template: "modern",
-    reasonEn: "Modern template highlights skills & projects — perfect for students",
-    reasonAr: "القالب العصري يبرز المهارات والمشاريع — مثالي للطلاب",
-  };
+function pickTemplate(t: OnboardingTargets) {
+  const stage = t.stage as "freshman" | "student" | "graduate";
+  const goal = t.goal as "volunteering" | "internship" | "part-time" | "full-time";
+  return selectTemplate(stage, goal);
 }
 
 // ── Section order ──
-function buildSectionOrder(t: OnboardingTargets): ResumeSection[] {
-  if (t.stage === "freshman") {
-    return ["summary", "education", "skills", "projects", "certifications", "languages", "experience"];
-  }
-  if (t.stage === "student") {
-    return ["summary", "education", "projects", "skills", "experience", "certifications", "languages"];
-  }
-  // graduate
-  return ["summary", "education", "experience", "projects", "skills", "certifications", "languages"];
+function buildSectionOrder(t: OnboardingTargets): SectionKey[] {
+  const stage = t.stage as "freshman" | "student" | "graduate";
+  const goal = t.goal as "volunteering" | "internship" | "part-time" | "full-time";
+  return getSectionOrder(stage, goal);
 }
-
-// ── Strengths per tier ──
-function buildStrengths(t: OnboardingTargets): { en: string[]; ar: string[] } {
-  const stageMap: Record<string, { en: string[]; ar: string[] }> = {
-    freshman: {
-      en: ["High Potential & Eagerness to Learn", "Fast Learner & Adaptable", "Extracurricular & Leadership Mindset"],
-      ar: ["إمكانيات عالية وشغف بالتعلم", "سرعة تعلّم وقدرة على التكيّف", "عقلية قيادية ونشاط لا منهجي"],
-    },
-    student: {
-      en: ["Academic Excellence & Strong GPA", "Project-based Practical Experience", "Solid Technical Foundation"],
-      ar: ["تميّز أكاديمي ومعدل تراكمي قوي", "خبرة عملية من خلال المشاريع", "أساس تقني متين"],
-    },
-    graduate: {
-      en: ["Professional Readiness & Confidence", "Specialized Knowledge in Field", "Strong Career Motivation"],
-      ar: ["جاهزية مهنية وثقة عالية", "معرفة متخصصة في المجال", "دافع مهني قوي"],
-    },
-  };
-
-  return stageMap[t.stage] || stageMap.student;
-}
-
-// ── Industry-specific skills ──
-const industrySkills: Record<string, { en: string; ar: string }> = {
-  tech: { en: "Programming, Python, JavaScript, SQL, Git, Data Structures, Web Development, Problem Solving, Cloud Basics, Agile", ar: "برمجة, Python, JavaScript, SQL, Git, هياكل بيانات, تطوير ويب, حل مشكلات, أساسيات سحابية, Agile" },
-  business: { en: "Financial Analysis, Excel, Power BI, Market Research, Strategic Planning, Communication, Project Management, Budgeting, Presentation Skills", ar: "تحليل مالي, Excel, Power BI, بحث السوق, تخطيط استراتيجي, تواصل, إدارة مشاريع, إعداد ميزانيات, مهارات عرض" },
-  healthcare: { en: "Patient Care, Clinical Research, Medical Terminology, First Aid, Electronic Health Records, Lab Skills, Data Analysis, Health & Safety", ar: "رعاية المرضى, بحث سريري, مصطلحات طبية, إسعافات أولية, سجلات صحية إلكترونية, مهارات مخبرية, تحليل بيانات, صحة وسلامة" },
-  engineering: { en: "AutoCAD, SolidWorks, MATLAB, Technical Drawing, Project Management, Quality Control, Process Design, Safety Standards, Problem Solving", ar: "AutoCAD, SolidWorks, MATLAB, رسم تقني, إدارة مشاريع, مراقبة جودة, تصميم عمليات, معايير سلامة, حل مشكلات" },
-  creative: { en: "Adobe Creative Suite, Figma, UI/UX Design, Branding, Typography, Photography, Video Editing, Design Thinking, Illustration", ar: "Adobe Creative Suite, Figma, تصميم UI/UX, هوية بصرية, خطوط, تصوير, مونتاج, تفكير تصميمي, رسم توضيحي" },
-  law: { en: "Legal Research, Contract Drafting, Case Analysis, Regulatory Compliance, Negotiation, Legal Writing, Critical Thinking, Dispute Resolution", ar: "بحث قانوني, صياغة عقود, تحليل قضايا, الامتثال التنظيمي, تفاوض, كتابة قانونية, تفكير نقدي, حل نزاعات" },
-  other: { en: "Communication, Problem Solving, Team Collaboration, Time Management, Critical Thinking, Adaptability, Leadership, Microsoft Office", ar: "تواصل, حل مشكلات, عمل جماعي, إدارة الوقت, تفكير نقدي, تكيّف, قيادة, Microsoft Office" },
-};
 
 // ── Summary builder ──
 function buildSummary(t: OnboardingTargets): { en: string; ar: string } {
@@ -79,37 +40,33 @@ function buildSummary(t: OnboardingTargets): { en: string; ar: string } {
   const fieldAr = fieldLabel(t.industry, "ar");
   const goalEn = goalLabel(t.goal, "en");
   const goalAr = goalLabel(t.goal, "ar");
+  const goalConfig = GOAL_CONFIG[t.goal as keyof typeof GOAL_CONFIG];
+  const toneEn = goalConfig?.toneEn ?? "";
+  const toneAr = goalConfig?.toneAr ?? "";
 
   if (t.stage === "freshman") {
     return {
-      en: `Motivated freshman studying ${fieldEn}, eager to develop skills through ${goalEn}. Quick learner with strong interpersonal skills, active participation in extracurricular activities, and a growth mindset.`,
-      ar: `طالب مستجد متحمس يدرس ${fieldAr}، يسعى لتطوير مهاراته من خلال ${goalAr}. سريع التعلم مع مهارات تواصل قوية ومشاركة فعالة في الأنشطة اللامنهجية وعقلية تطوير مستمر.`,
+      en: `Motivated freshman studying ${fieldEn}, eager to develop skills through ${goalEn}. Quick learner with strong interpersonal skills, active participation in extracurricular activities, and a growth mindset. (${toneEn})`,
+      ar: `طالب مستجد متحمس يدرس ${fieldAr}، يسعى لتطوير مهاراته من خلال ${goalAr}. سريع التعلم مع مهارات تواصل قوية ومشاركة فعالة في الأنشطة اللامنهجية وعقلية تطوير مستمر. (${toneAr})`,
     };
   }
   if (t.stage === "student") {
     return {
-      en: `Dedicated university student in ${fieldEn} with strong academic performance and hands-on project experience. Seeking ${goalEn} to apply technical knowledge and contribute to a professional environment. Known for analytical thinking and collaborative teamwork.`,
-      ar: `طالب جامعي مجتهد في تخصص ${fieldAr} بأداء أكاديمي متميز وخبرة عملية في المشاريع. يبحث عن ${goalAr} لتطبيق معرفته التقنية والمساهمة في بيئة مهنية. يتميز بالتفكير التحليلي والعمل الجماعي.`,
+      en: `Dedicated university student in ${fieldEn} with strong academic performance and hands-on project experience. Seeking ${goalEn} to apply technical knowledge and contribute to a professional environment. Known for analytical thinking and collaborative teamwork. (${toneEn})`,
+      ar: `طالب جامعي مجتهد في تخصص ${fieldAr} بأداء أكاديمي متميز وخبرة عملية في المشاريع. يبحث عن ${goalAr} لتطبيق معرفته التقنية والمساهمة في بيئة مهنية. يتميز بالتفكير التحليلي والعمل الجماعي. (${toneAr})`,
     };
   }
   // graduate
   return {
-    en: `Recent ${fieldEn} graduate with solid academic foundation and practical project experience. Driven to launch a professional career through ${goalEn}. Combines specialized knowledge with strong communication skills and a results-oriented mindset.`,
-    ar: `خريج حديث في تخصص ${fieldAr} بأساس أكاديمي متين وخبرة عملية في المشاريع. مدفوع لبدء مسيرته المهنية من خلال ${goalAr}. يجمع بين المعرفة المتخصصة ومهارات التواصل القوية والتوجه نحو النتائج.`,
+    en: `Recent ${fieldEn} graduate with solid academic foundation and practical project experience. Driven to launch a professional career through ${goalEn}. Combines specialized knowledge with strong communication skills and a results-oriented mindset. (${toneEn})`,
+    ar: `خريج حديث في تخصص ${fieldAr} بأساس أكاديمي متين وخبرة عملية في المشاريع. مدفوع لبدء مسيرته المهنية من خلال ${goalAr}. يجمع بين المعرفة المتخصصة ومهارات التواصل القوية والتوجه نحو النتائج. (${toneAr})`,
   };
 }
 
 function fieldLabel(industry: string, lang: string): string {
-  const map: Record<string, { en: string; ar: string }> = {
-    tech: { en: "Information Technology", ar: "تقنية المعلومات" },
-    business: { en: "Business Administration", ar: "إدارة الأعمال" },
-    engineering: { en: "Engineering", ar: "الهندسة" },
-    healthcare: { en: "Health Sciences", ar: "العلوم الصحية" },
-    creative: { en: "Design & Creative Arts", ar: "التصميم والفنون الإبداعية" },
-    law: { en: "Law", ar: "القانون" },
-    other: { en: "the field", ar: "المجال" },
-  };
-  return lang === "ar" ? (map[industry]?.ar || "المجال") : (map[industry]?.en || "the field");
+  const field = FIELD_CONFIG[industry as keyof typeof FIELD_CONFIG];
+  if (!field) return lang === "ar" ? "المجال" : "the field";
+  return lang === "ar" ? field.labelAr : field.labelEn;
 }
 
 function goalLabel(goal: string, lang: string): string {
@@ -125,7 +82,8 @@ function goalLabel(goal: string, lang: string): string {
 // ── Prefilled data ──
 function generatePrefilled(t: OnboardingTargets): ResumeData {
   const isAr = t.language === "ar";
-  const skills = industrySkills[t.industry] || industrySkills.other;
+  const field = FIELD_CONFIG[t.industry as keyof typeof FIELD_CONFIG] ?? FIELD_CONFIG.other;
+  const skills = isAr ? field.skillsAr.join(", ") : field.skillsEn.join(", ");
   const summary = buildSummary(t);
 
   return {
@@ -171,7 +129,7 @@ function generatePrefilled(t: OnboardingTargets): ResumeData {
         date: "2024",
       },
     ],
-    skills: isAr ? skills.ar : skills.en,
+    skills,
     languages: isAr
       ? [{ name: "العربية", level: "اللغة الأم" }, { name: "الإنجليزية", level: "متوسط" }]
       : [{ name: "English", level: "Native" }, { name: "Arabic", level: "Intermediate" }],
@@ -192,7 +150,6 @@ function buildProjects(t: OnboardingTargets): ResumeData["projects"] {
       },
     ];
   }
-  // student & graduate
   return [
     {
       name: isAr ? "[اسم المشروع الأكاديمي أو التطبيقي]" : "[Academic or Applied Project Name]",
@@ -213,8 +170,9 @@ function buildProjects(t: OnboardingTargets): ResumeData["projects"] {
 
 // ── Main export ──
 export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult {
+  const stage = targets.stage as "freshman" | "student" | "graduate";
   const { template, reasonEn, reasonAr } = pickTemplate(targets);
-  const strengths = buildStrengths(targets);
+  const persona = PERSONA_CONFIG[stage];
   const sectionOrder = buildSectionOrder(targets);
   const prefilled = generatePrefilled(targets);
 
@@ -222,8 +180,8 @@ export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult
     template,
     templateReasonEn: reasonEn,
     templateReasonAr: reasonAr,
-    strengthsEn: strengths.en,
-    strengthsAr: strengths.ar,
+    strengthsEn: [...persona.strengthsEn],
+    strengthsAr: [...persona.strengthsAr],
     sectionOrder,
     prefilled,
   };

@@ -11,18 +11,21 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SectionProgress } from "@/lib/careerTargets";
-import { computeOverallProgress } from "@/lib/careerTargets";
+import { computeWeightedOverall } from "@/lib/careerTargets";
 
 interface Props {
   sections: SectionProgress[];
   lang: "en" | "ar";
+  persona?: { stage: string; industry: string; goal: string } | null;
 }
 
-export default function TargetChecklist({ sections, lang }: Props) {
+export default function TargetChecklist({ sections, lang, persona }: Props) {
   const [expanded, setExpanded] = useState(true);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const l = (en: string, ar: string) => (lang === "ar" ? ar : en);
-  const overall = computeOverallProgress(sections);
+  const overall = persona
+    ? computeWeightedOverall(sections, persona)
+    : (sections.length > 0 ? Math.round(sections.reduce((s, sec) => s + sec.percent, 0) / sections.length) : 0);
   const allDone = overall === 100;
 
   const totalTargets = sections.reduce((s, sec) => s + sec.targets.length, 0);

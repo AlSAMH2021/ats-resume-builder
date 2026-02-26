@@ -23,6 +23,7 @@ export default function ResumePreview({ data, lang, template = "classic", colors
   const h2Style = { color: c.headingColor, borderBottomColor: c.lineColor };
 
   const sections: Record<ResumeSection, JSX.Element | null> = {
+    personal: null, // rendered separately as header
     summary: hasContent(data.summary) ? (
       <div key="summary">
         <h2 style={h2Style}>{l(lang, "PROFESSIONAL SUMMARY", "الملخص المهني")}</h2>
