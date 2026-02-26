@@ -8,6 +8,8 @@ import {
   Star, ChevronDown
 } from "lucide-react";
 import seeratyLogo from "@/assets/seeraty_logo.png";
+import RotatingText from "@/components/landing/RotatingText";
+import ResumeMockup from "@/components/landing/ResumeMockup";
 
 // Premium easing curves — landing page only
 const premiumEase = [0.22, 1, 0.36, 1] as const;
@@ -161,66 +163,82 @@ const Landing = () => {
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-0 start-1/4 w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl" />
           <div className="absolute bottom-0 end-1/4 w-[400px] h-[400px] rounded-full bg-accent/5 blur-3xl" />
+          <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-primary/3 blur-3xl" />
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 pt-20 pb-16 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: premiumEase }}
-            className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            {l("AI-Powered Resume Builder", "منشئ سير ذاتية بالذكاء الاصطناعي")}
-          </motion.div>
+        <div className="max-w-6xl mx-auto px-4 pt-16 pb-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Text Side */}
+            <div className={`text-center lg:text-start ${isRTL ? "lg:order-1" : ""}`}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: premiumEase }}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                {l("AI-Powered Resume Builder", "منشئ سير ذاتية بالذكاء الاصطناعي")}
+              </motion.div>
 
-          <motion.h1
-            {...heroReveal(0.15)}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-tight"
-          >
-            {l("Build Your Perfect CV", "ابنِ سيرتك الذاتية")}
-            <br />
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {l("In Minutes, Not Hours", "في دقائق، لا ساعات")}
-            </span>
-          </motion.h1>
+              <motion.h1
+                {...heroReveal(0.15)}
+                className="text-4xl sm:text-5xl md:text-[3.4rem] font-extrabold tracking-tight text-foreground leading-[1.15]"
+              >
+                {l("Build Your CV for", "ابنِ سيرتك لـ")}
+                <br />
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  <RotatingText
+                    words={lang === "ar"
+                      ? ["وظيفة أحلامك", "منحتك الدراسية", "ترقيتك القادمة", "مشروعك الخاص"]
+                      : ["Your Dream Job", "A Scholarship", "Your Promotion", "A Career Shift"]
+                    }
+                  />
+                </span>
+              </motion.h1>
 
-          <motion.p
-            {...heroReveal(0.25)}
-            className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto"
-          >
-            {l(
-              "Seeraty analyzes your goals, selects the best template, and generates a professional ATS-optimized resume — ready for your dream job.",
-              "سيرتي تحلل أهدافك، تختار القالب الأنسب، وتُنشئ سيرة ذاتية احترافية متوافقة مع أنظمة التوظيف — جاهزة لوظيفة أحلامك."
-            )}
-          </motion.p>
+              <motion.p
+                {...heroReveal(0.25)}
+                className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0"
+              >
+                {l(
+                  "Seeraty analyzes your goals, selects the best template, and generates a professional ATS-optimized resume — ready in minutes.",
+                  "سيرتي تحلل أهدافك، تختار القالب الأنسب، وتُنشئ سيرة ذاتية احترافية متوافقة مع أنظمة التوظيف — جاهزة في دقائق."
+                )}
+              </motion.p>
 
-          <motion.div
-            {...heroReveal(0.35)}
-            className="mt-8 flex items-center justify-center gap-4 flex-wrap"
-          >
-            <Button size="lg" onClick={handleStart} className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 py-6 rounded-xl shadow-lg shadow-primary/25">
-              {l("Build My CV Now", "ابنِ سيرتي الآن")}
-              {isRTL ? <ArrowLeft className="w-5 h-5 ms-2" /> : <ArrowRight className="w-5 h-5 ms-2" />}
-            </Button>
-            <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-xl" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
-              {l("Explore Features", "اكتشف المميزات")}
-              <ChevronDown className="w-4 h-4 ms-1" />
-            </Button>
-          </motion.div>
+              <motion.div
+                {...heroReveal(0.35)}
+                className="mt-8 flex items-center gap-4 flex-wrap justify-center lg:justify-start"
+              >
+                <Button size="lg" onClick={handleStart} className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 py-6 rounded-xl shadow-lg shadow-primary/25">
+                  {l("Build My CV Now", "ابنِ سيرتي الآن")}
+                  {isRTL ? <ArrowLeft className="w-5 h-5 ms-2" /> : <ArrowRight className="w-5 h-5 ms-2" />}
+                </Button>
+                <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-xl" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
+                  {l("Explore Features", "اكتشف المميزات")}
+                  <ChevronDown className="w-4 h-4 ms-1" />
+                </Button>
+              </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            {...heroReveal(0.5)}
-            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto"
-          >
-            {stats.map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="text-3xl font-extrabold text-primary">{lang === "ar" ? s.valueAr : s.valueEn}</div>
-                <div className="text-sm text-muted-foreground mt-1">{lang === "ar" ? s.labelAr : s.labelEn}</div>
-              </div>
-            ))}
-          </motion.div>
+              {/* Stats inline */}
+              <motion.div
+                {...heroReveal(0.5)}
+                className="mt-10 flex items-center gap-6 flex-wrap justify-center lg:justify-start"
+              >
+                {stats.map((s, i) => (
+                  <div key={i} className="text-center">
+                    <div className="text-2xl font-extrabold text-primary">{lang === "ar" ? s.valueAr : s.valueEn}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{lang === "ar" ? s.labelAr : s.labelEn}</div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Mockup Side */}
+            <div className="flex justify-center lg:justify-end">
+              <ResumeMockup />
+            </div>
+          </div>
         </div>
       </section>
 
