@@ -29,7 +29,7 @@ export interface SectionProgress {
   targets: (CareerTarget & { met: boolean })[];
 }
 
-type Persona = { stage: string; industry: string; goal: string };
+type Persona = { stage: string; industry: string; goal: string; yearCurrent?: number; yearTotal?: number };
 
 // ── Helpers ──
 
