@@ -98,187 +98,59 @@
 /* A4 Preview Styles */
 .resume-preview {
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1.7;
+  font-size: 10.5pt;
+  line-height: 1.65;
   color: #1a1a1a;
 }
 
-/* ── Seeraty V2 Template (matching PDF) ── */
-.resume-seeraty-v2 .rv2-section {
-  margin-bottom: 8pt;
+.rv2-section {
+  margin-bottom: 14pt;
 }
 
-.resume-seeraty-v2 .rv2-heading {
+.rv2-heading {
   font-size: 11pt;
   font-weight: 700;
   color: hsl(197, 71%, 33%);
-  border-bottom: 2.5px solid hsl(197, 71%, 33%);
-  padding-bottom: 4pt;
-  margin-bottom: 10pt;
-  margin-top: 0;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.resume-seeraty-v2 .rv2-field {
-  padding: 3pt 0;
-  font-size: 10.5pt;
-}
-
-.resume-seeraty-v2 .rv2-label {
-  font-weight: 400;
-  color: #333;
-}
-
-.resume-seeraty-v2 .rv2-colon {
-  color: #666;
-}
-
-.resume-seeraty-v2 .rv2-value {
-  font-weight: 400;
-  color: #1a1a1a;
-}
-
-/* Progress dots */
-.resume-seeraty-v2 .rv2-sub-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2pt;
+  border-bottom: 2px solid hsl(197, 71%, 33%);
+  padding-bottom: 3pt;
   margin-bottom: 8pt;
+  margin-top: 0;
 }
 
-.progress-dots {
-  display: flex;
-  align-items: center;
-  position: relative;
-  height: 14pt;
-  margin-bottom: 2pt;
-}
-
-.progress-dots-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #e0e0e0;
-  transform: translateY(-50%);
-}
-
-[dir="rtl"] .progress-dots-line {
-  left: 0;
-  right: 0;
-}
-
-.progress-dot {
-  width: 10pt;
-  height: 10pt;
-  border-radius: 50%;
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  margin-inline-end: auto;
-}
-
-.progress-dot-filled {
-  background: hsl(145, 50%, 62%);
-  border: 2px solid hsl(145, 50%, 52%);
-}
-
-.progress-dot-empty {
-  background: #e0e0e0;
-  border: 2px solid #ccc;
-}
-
-.resume-seeraty-v2 .rv2-sub-label {
-  font-size: 11pt;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.resume-seeraty-v2 .rv2-list-item {
+.rv2-field-line {
   font-size: 10.5pt;
-  padding: 3pt 0;
+  margin: 3pt 0;
   color: #333;
 }
 
-.resume-seeraty-v2 .rv2-divider {
-  border: none;
-  border-top: 1.5px dashed #ccc;
-  margin: 10pt 0;
-}
-
-/* Experience block */
-.resume-seeraty-v2 .rv2-exp-header {
-  margin-bottom: 4pt;
-}
-
-.resume-seeraty-v2 .rv2-exp-title {
-  font-weight: 700;
-  font-size: 10.5pt;
+.rv2-field-line strong {
   color: #1a1a1a;
 }
 
-.resume-seeraty-v2 .rv2-exp-org {
-  font-size: 10pt;
-  color: #555;
-  margin-inline-start: 6pt;
-}
-
-.resume-seeraty-v2 .rv2-exp-tasks {
-  padding-inline-start: 8pt;
-}
-
-.resume-seeraty-v2 .rv2-experience-block {
+.rv2-block {
   margin-bottom: 10pt;
 }
 
-/* Language level bar */
-.level-bar-container {
-  margin: 4pt 0 8pt 0;
+.rv2-sub-title {
+  font-size: 10.5pt;
+  margin: 6pt 0 4pt 0;
+  color: #1a1a1a;
 }
 
-.level-bar-track {
-  position: relative;
-  height: 8pt;
-  background: hsl(145, 50%, 85%);
-  border-radius: 4pt;
-  overflow: visible;
+.rv2-list-line {
+  font-size: 10pt;
+  margin: 2pt 0;
+  color: #444;
+  padding-inline-start: 6pt;
 }
 
-.level-bar-fill {
-  height: 100%;
-  background: hsl(145, 50%, 62%);
-  border-radius: 4pt;
-  transition: width 0.3s ease;
+.rv2-exp-title-line {
+  font-size: 10.5pt;
+  margin: 2pt 0 4pt 0;
 }
 
-.level-bar-label-start,
-.level-bar-label-end {
-  position: absolute;
-  top: -14pt;
-  font-size: 7pt;
-  color: #888;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.level-bar-label-start {
-  right: 4pt;
-}
-
-.level-bar-label-end {
-  left: 4pt;
-}
-
-[dir="rtl"] .level-bar-label-start {
-  right: auto;
-  left: 4pt;
-}
-
-[dir="rtl"] .level-bar-label-end {
-  left: auto;
-  right: 4pt;
+.rv2-bullets {
+  padding-inline-start: 4pt;
 }
 
 /* Print Styles */
