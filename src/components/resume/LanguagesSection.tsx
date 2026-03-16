@@ -22,7 +22,7 @@ export default function LanguagesSection({ lang }: Props) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">
-          {l(lang, "Languages", "اللغات")}
+          {l(lang, "Section 5: Languages", "القسم الخامس: اللغات")}
         </h3>
         <Button
           type="button"

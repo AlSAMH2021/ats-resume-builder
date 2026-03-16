@@ -1,7 +1,6 @@
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import type { ResumeData } from "@/types/resume";
@@ -18,7 +17,7 @@ export default function EducationSection({ lang }: Props) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">
-          {l(lang, "Education", "التعليم")}
+          {l(lang, "Section 2: Academic Education", "القسم الثاني: التعليم الأكاديمي")}
         </h3>
         <Button
           type="button"
@@ -41,29 +40,13 @@ export default function EducationSection({ lang }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <Label className="text-xs text-muted-foreground">{l(lang, "Degree", "الدرجة العلمية")}</Label>
+              <Label className="text-xs text-muted-foreground">{l(lang, "Specialization", "التخصص")}</Label>
               <Input {...register(`education.${index}.degree`)} className="mt-0.5 h-8 text-sm" />
             </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">{l(lang, "Institution", "المؤسسة التعليمية")}</Label>
+            <div className="col-span-2">
+              <Label className="text-xs text-muted-foreground">{l(lang, "University / Institution", "الجامعة")}</Label>
               <Input {...register(`education.${index}.institution`)} className="mt-0.5 h-8 text-sm" />
             </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">{l(lang, "Location", "الموقع")}</Label>
-              <Input {...register(`education.${index}.location`)} className="mt-0.5 h-8 text-sm" />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">{l(lang, "Start", "البداية")}</Label>
-              <Input {...register(`education.${index}.startDate`)} placeholder="YYYY" className="mt-0.5 h-8 text-sm" />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">{l(lang, "End", "النهاية")}</Label>
-              <Input {...register(`education.${index}.endDate`)} placeholder="YYYY" className="mt-0.5 h-8 text-sm" />
-            </div>
-          </div>
-          <div>
-            <Label className="text-xs text-muted-foreground">{l(lang, "Details", "التفاصيل")}</Label>
-            <Textarea {...register(`education.${index}.description`)} rows={2} className="mt-0.5 text-sm resize-none" />
           </div>
         </div>
       ))}
