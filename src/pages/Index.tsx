@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2, Home } from "lucide-react";
+import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2 } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TargetChecklist from "@/components/resume/TargetChecklist";
