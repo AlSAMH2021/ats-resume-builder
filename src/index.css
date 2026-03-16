@@ -97,295 +97,188 @@
 
 /* A4 Preview Styles */
 .resume-preview {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   font-size: 11pt;
-  line-height: 1.5;
+  line-height: 1.7;
   color: #1a1a1a;
 }
 
-.resume-preview h1 {
-  font-size: 20pt;
-  font-weight: 700;
-  margin-bottom: 2pt;
+/* ── Seeraty V2 Template (matching PDF) ── */
+.resume-seeraty-v2 .rv2-section {
+  margin-bottom: 8pt;
 }
 
-.resume-preview h2 {
-  font-size: 12pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1.5px solid #1a1a1a;
-  padding-bottom: 2pt;
-  margin-top: 12pt;
-  margin-bottom: 6pt;
-}
-
-.resume-preview h3 {
+.resume-seeraty-v2 .rv2-heading {
   font-size: 11pt;
   font-weight: 700;
-  margin-bottom: 1pt;
+  color: hsl(197, 71%, 33%);
+  border-bottom: 2.5px solid hsl(197, 71%, 33%);
+  padding-bottom: 4pt;
+  margin-bottom: 10pt;
+  margin-top: 0;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-.resume-preview p {
-  margin: 0;
-}
-
-.resume-preview ul {
-  padding-left: 16pt;
-  margin: 3pt 0;
-}
-
-.resume-preview ul li {
-  margin-bottom: 2pt;
-}
-
-.resume-preview .contact-line {
-  font-size: 10pt;
-  color: #444;
-}
-
-/* ── Modern Template ── */
-.resume-modern {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-}
-
-.resume-modern h1 {
-  font-size: 22pt;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.resume-modern h2 {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 11pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  border-bottom: 2.5px solid #2a7a8c;
-  color: #2a7a8c;
-  padding-bottom: 3pt;
-}
-
-.resume-modern h3 {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 700;
-}
-
-/* ── Minimal Template ── */
-.resume-minimal {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  font-size: 10pt;
-  line-height: 1.4;
-}
-
-.resume-minimal h1 {
-  font-size: 16pt;
-  font-weight: 600;
-  margin-bottom: 1pt;
-}
-
-.resume-minimal h2 {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  font-size: 9pt;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border-bottom: 0.75px solid #999;
-  color: #555;
-  padding-bottom: 2pt;
-  margin-top: 10pt;
-  margin-bottom: 4pt;
-}
-
-.resume-minimal h3 {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  font-size: 10pt;
-  font-weight: 600;
-}
-
-.resume-minimal ul {
-  padding-left: 12pt;
-  margin: 2pt 0;
-}
-
-.resume-minimal ul li {
-  margin-bottom: 1pt;
-}
-
-/* ── Executive Template ── */
-.resume-executive {
-  font-family: 'Cambria', 'Palatino Linotype', 'Book Antiqua', serif;
+.resume-seeraty-v2 .rv2-field {
+  padding: 3pt 0;
   font-size: 10.5pt;
-  line-height: 1.5;
 }
 
-.resume-executive h1 {
-  font-size: 24pt;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-bottom: 3px double #6d28d9;
-  padding-bottom: 6pt;
-  margin-bottom: 4pt;
+.resume-seeraty-v2 .rv2-label {
+  font-weight: 400;
+  color: #333;
 }
 
-.resume-executive h2 {
-  font-family: 'Cambria', serif;
-  font-size: 11pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #6d28d9;
-  border-bottom: none;
-  background: linear-gradient(90deg, #f3e8ff 0%, transparent 100%);
-  padding: 4pt 8pt;
-  margin-top: 14pt;
-  margin-bottom: 6pt;
-  border-left: 3px solid #6d28d9;
+.resume-seeraty-v2 .rv2-colon {
+  color: #666;
 }
 
-.resume-executive h3 {
-  font-family: 'Cambria', serif;
-  font-size: 10.5pt;
-  font-weight: 700;
+.resume-seeraty-v2 .rv2-value {
+  font-weight: 400;
+  color: #1a1a1a;
 }
 
-.resume-executive ul {
-  padding-left: 14pt;
-  margin: 3pt 0;
+/* Progress dots */
+.resume-seeraty-v2 .rv2-sub-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+  margin-bottom: 8pt;
 }
 
-.resume-executive ul li {
-  margin-bottom: 2pt;
-}
-
-.resume-executive .contact-line {
-  font-size: 9.5pt;
-  letter-spacing: 0.5px;
-}
-
-/* ── Seeraty Signature Template ── */
-.resume-seeraty {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 10.5pt;
-  line-height: 1.55;
+.progress-dots {
+  display: flex;
+  align-items: center;
   position: relative;
-  padding-top: 0;
+  height: 14pt;
+  margin-bottom: 2pt;
 }
 
-.resume-seeraty .seeraty-accent-bar {
+.progress-dots-line {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
-  height: 5px;
-  border-radius: 0 0 2px 2px;
+  height: 2px;
+  background: #e0e0e0;
+  transform: translateY(-50%);
 }
 
-[dir="rtl"] .resume-seeraty .seeraty-accent-bar {
-  border-radius: 0 0 2px 2px;
+[dir="rtl"] .progress-dots-line {
+  left: 0;
+  right: 0;
 }
 
-.resume-seeraty .seeraty-header {
-  padding-top: 14pt;
-  padding-bottom: 12pt;
-  border-bottom: 2px solid #f0ebff;
-  margin-bottom: 10pt;
-  text-align: center;
-}
-
-.resume-seeraty h1 {
-  font-size: 22pt;
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin-bottom: 2pt;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.resume-seeraty .seeraty-job-title {
-  font-size: 11pt;
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 6pt;
-  letter-spacing: 0.3px;
-}
-
-.resume-seeraty .seeraty-contact {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6pt;
-}
-
-.resume-seeraty .seeraty-contact-item {
-  font-size: 9pt;
-  color: #666;
-  padding: 2pt 8pt;
-  background: #f8f5ff;
-  border-radius: 12pt;
-  border: 0.5px solid #e9e0ff;
-}
-
-.resume-seeraty .seeraty-body {
-  padding: 0;
-}
-
-.resume-seeraty .seeraty-section {
-  margin-bottom: 2pt;
-}
-
-.resume-seeraty h2 {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 10pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border-bottom: none;
-  padding: 4pt 10pt;
-  margin-top: 10pt;
-  margin-bottom: 5pt;
-  background: linear-gradient(90deg, #f5f0ff 0%, transparent 100%);
-  border-left: 3px solid #7c3aed;
-  border-radius: 0 4px 4px 0;
-}
-
-[dir="rtl"] .resume-seeraty h2 {
-  border-left: none;
-  border-right: 3px solid #7c3aed;
-  background: linear-gradient(270deg, #f5f0ff 0%, transparent 100%);
-  border-radius: 4px 0 0 4px;
-}
-
-.resume-seeraty h3 {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 10.5pt;
-  font-weight: 700;
-}
-
-.resume-seeraty ul {
-  padding-left: 14pt;
-  margin: 3pt 0;
-}
-
-.resume-seeraty ul li {
-  margin-bottom: 2pt;
+.progress-dot {
+  width: 10pt;
+  height: 10pt;
+  border-radius: 50%;
   position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-inline-end: auto;
 }
 
-.resume-seeraty ul li::marker {
-  color: #7c3aed;
+.progress-dot-filled {
+  background: hsl(145, 50%, 62%);
+  border: 2px solid hsl(145, 50%, 52%);
 }
 
-.resume-seeraty .seeraty-watermark {
-  text-align: center;
+.progress-dot-empty {
+  background: #e0e0e0;
+  border: 2px solid #ccc;
+}
+
+.resume-seeraty-v2 .rv2-sub-label {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.resume-seeraty-v2 .rv2-list-item {
+  font-size: 10.5pt;
+  padding: 3pt 0;
+  color: #333;
+}
+
+.resume-seeraty-v2 .rv2-divider {
+  border: none;
+  border-top: 1.5px dashed #ccc;
+  margin: 10pt 0;
+}
+
+/* Experience block */
+.resume-seeraty-v2 .rv2-exp-header {
+  margin-bottom: 4pt;
+}
+
+.resume-seeraty-v2 .rv2-exp-title {
+  font-weight: 700;
+  font-size: 10.5pt;
+  color: #1a1a1a;
+}
+
+.resume-seeraty-v2 .rv2-exp-org {
+  font-size: 10pt;
+  color: #555;
+  margin-inline-start: 6pt;
+}
+
+.resume-seeraty-v2 .rv2-exp-tasks {
+  padding-inline-start: 8pt;
+}
+
+.resume-seeraty-v2 .rv2-experience-block {
+  margin-bottom: 10pt;
+}
+
+/* Language level bar */
+.level-bar-container {
+  margin: 4pt 0 8pt 0;
+}
+
+.level-bar-track {
+  position: relative;
+  height: 8pt;
+  background: hsl(145, 50%, 85%);
+  border-radius: 4pt;
+  overflow: visible;
+}
+
+.level-bar-fill {
+  height: 100%;
+  background: hsl(145, 50%, 62%);
+  border-radius: 4pt;
+  transition: width 0.3s ease;
+}
+
+.level-bar-label-start,
+.level-bar-label-end {
+  position: absolute;
+  top: -14pt;
   font-size: 7pt;
-  opacity: 0.2;
-  letter-spacing: 3px;
-  margin-top: 20pt;
+  color: #888;
   font-weight: 600;
+  text-transform: uppercase;
+}
+
+.level-bar-label-start {
+  right: 4pt;
+}
+
+.level-bar-label-end {
+  left: 4pt;
+}
+
+[dir="rtl"] .level-bar-label-start {
+  right: auto;
+  left: 4pt;
+}
+
+[dir="rtl"] .level-bar-label-end {
+  left: auto;
+  right: 4pt;
 }
 
 /* Print Styles */
