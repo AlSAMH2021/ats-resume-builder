@@ -63,11 +63,19 @@ function isPlaceholder(text: string): boolean {
 // ── Target definitions ──
 
 function getTargets(persona: Persona): CareerTarget[] {
-  const { stage, industry, goal } = persona;
+  const { stage, industry, goal, yearCurrent = 1, yearTotal = 4 } = persona;
   const targets: CareerTarget[] = [];
   const personaCfg = PERSONA_CONFIG[stage as Stage] ?? PERSONA_CONFIG.student;
   const fieldCfg = FIELD_CONFIG[industry as Field] ?? FIELD_CONFIG.other;
   const goalCfg = GOAL_CONFIG[goal as Goal] ?? GOAL_CONFIG["part-time"];
+
+  // Year-specific requirements
+  const yearLabel = (en: string, ar: string) => en;
+  const minCerts = yearCurrent <= 1 ? 1 : yearCurrent <= 2 ? 1 : yearCurrent <= 3 ? 2 : 2;
+  const minCourses = yearCurrent <= 1 ? 0 : yearCurrent <= 2 ? 1 : yearCurrent <= 3 ? 2 : 3;
+  const minSkillsForYear = yearCurrent <= 1 ? 3 : yearCurrent <= 2 ? 4 : yearCurrent <= 3 ? 5 : 6;
+  const minExperiences = yearCurrent <= 2 ? 0 : yearCurrent <= 3 ? 1 : 1;
+  const minProjects = yearCurrent <= 1 ? 0 : yearCurrent <= 2 ? 1 : yearCurrent <= 3 ? 1 : 2;
 
   // ════════════════════════════════════════
   // UNIVERSAL TARGETS
