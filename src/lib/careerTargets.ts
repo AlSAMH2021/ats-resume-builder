@@ -196,76 +196,142 @@ function getTargets(persona: Persona): CareerTarget[] {
   // PERSONA-SPECIFIC TARGETS
   // ════════════════════════════════════════
 
-  if (stage === "freshman") {
-    // 4+ soft skills
-    targets.push({
-      sectionKey: "skills",
-      requirementEn: "List at least 4 soft skills",
-      requirementAr: "أضف 4 مهارات شخصية على الأقل",
-      tipEn: "As a freshman, soft skills like communication and teamwork are your strongest assets.",
-      tipAr: "كمستجد، المهارات الشخصية كالتواصل والعمل الجماعي هي أقوى نقاط قوتك.",
-      weight: 4,
-      category: "required",
-      check: (d) => getSkillsList(d).length >= 4,
-    });
+  // ════════════════════════════════════════
+  // YEAR-BASED TARGETS (replace stage-only logic)
+  // ════════════════════════════════════════
 
-    // 1+ volunteering/activity
+  // Skills — year-based minimum
+  targets.push({
+    sectionKey: "skills",
+    requirementEn: `List at least ${minSkillsForYear} skills (Year ${yearCurrent} target)`,
+    requirementAr: `أضف ${minSkillsForYear} مهارات على الأقل (مستهدف سنة ${yearCurrent})`,
+    tipEn: yearCurrent <= 1
+      ? "As a freshman, soft skills like communication and teamwork are your strongest assets."
+      : "Include a mix of technical and soft skills relevant to your field.",
+    tipAr: yearCurrent <= 1
+      ? "كمستجد، المهارات الشخصية كالتواصل والعمل الجماعي هي أقوى نقاط قوتك."
+      : "أضف مزيجاً من المهارات التقنية والشخصية المتعلقة بتخصصك.",
+    weight: 4,
+    category: "required",
+    check: (d) => getSkillsList(d).length >= minSkillsForYear,
+  });
+
+  // Certifications — year-based
+  if (minCerts > 0) {
+    targets.push({
+      sectionKey: "certifications",
+      requirementEn: `Add at least ${minCerts} certification${minCerts > 1 ? "s" : ""} (Year ${yearCurrent} target)`,
+      requirementAr: `أضف ${minCerts} شهاد${minCerts > 1 ? "تين" : "ة"} على الأقل (مستهدف سنة ${yearCurrent})`,
+      tipEn: "Online certifications from Coursera, Google, or similar platforms show continuous learning.",
+      tipAr: "الشهادات من Coursera أو Google تُظهر التعلم المستمر.",
+      weight: yearCurrent <= 1 ? 3 : 4,
+      category: yearCurrent <= 1 ? "recommended" : "required",
+      check: (d) => {
+        const validCerts = d.certifications.filter(c => c.name.length > 0 && !isPlaceholder(c.name));
+        return validCerts.length >= minCerts;
+      },
+    });
+  }
+
+  // Courses — year-based
+  if (minCourses > 0) {
+    targets.push({
+      sectionKey: "certifications",
+      requirementEn: `Complete at least ${minCourses} training course${minCourses > 1 ? "s" : ""} (Year ${yearCurrent} target)`,
+      requirementAr: `أكمل ${minCourses} دور${minCourses > 1 ? "ات" : "ة"} تدريبية على الأقل (مستهدف سنة ${yearCurrent})`,
+      tipEn: "Training courses strengthen your resume. Look for relevant workshops and online courses.",
+      tipAr: "الدورات التدريبية تقوي سيرتك. ابحث عن ورش عمل ودورات متعلقة بتخصصك.",
+      weight: 3,
+      category: yearCurrent >= 3 ? "required" : "recommended",
+      check: (d) => {
+        const validCourses = (d.courses || []).filter(c => c.name.length > 0 && !isPlaceholder(c.name));
+        return validCourses.length >= minCourses;
+      },
+    });
+  }
+
+  // Experience — year-based
+  if (minExperiences > 0) {
     targets.push({
       sectionKey: "experience",
-      requirementEn: "Add volunteer work or club activities",
-      requirementAr: "أضف عمل تطوعي أو أنشطة أندية",
-      tipEn: "Since you don't have formal experience yet, listing 2 volunteer activities will increase your chances by 40%.",
-      tipAr: "بما أنك لا تملك خبرة رسمية بعد، إضافة نشاطين تطوعيين سيزيد فرصك بنسبة 40%.",
-      weight: 4,
+      requirementEn: `Add at least ${minExperiences} work experience or internship (Year ${yearCurrent} target)`,
+      requirementAr: `أضف ${minExperiences} خبرة عملية أو تدريب على الأقل (مستهدف سنة ${yearCurrent})`,
+      tipEn: "Even short internships count. Include co-op training or part-time roles.",
+      tipAr: "حتى التدريبات القصيرة مهمة. أضف التدريب التعاوني أو العمل الجزئي.",
+      weight: 5,
       category: "required",
+      check: (d) => {
+        const valid = d.experiences.filter(e => e.company.length > 0 && !isPlaceholder(e.company));
+        return valid.length >= minExperiences;
+      },
+    });
+  } else {
+    // Year 1-2: volunteer/activity recommended
+    targets.push({
+      sectionKey: "experience",
+      requirementEn: `Add volunteer work or club activities (Year ${yearCurrent} target)`,
+      requirementAr: `أضف عمل تطوعي أو أنشطة أندية (مستهدف سنة ${yearCurrent})`,
+      tipEn: "Since you don't have formal experience yet, volunteer activities will boost your chances.",
+      tipAr: "بما أنك لا تملك خبرة رسمية بعد، الأنشطة التطوعية ستعزز فرصك.",
+      weight: 3,
+      category: "recommended",
       check: (d) =>
         d.experiences.length >= 1 &&
         hasBulletKeyword(d, ["volunteer", "تطوع", "club", "نادي", "community", "مجتمع"]),
     });
+  }
 
-    // Recommend 1 project
+  // Projects — year-based
+  if (minProjects > 0) {
     targets.push({
       sectionKey: "projects",
-      requirementEn: "Add at least 1 project (school or personal)",
-      requirementAr: "أضف مشروع واحد على الأقل (مدرسي أو شخصي)",
-      tipEn: "Any project shows initiative. Add a class project or personal hobby project.",
-      tipAr: "أي مشروع يُظهر المبادرة. أضف مشروع دراسي أو شخصي.",
-      weight: 3,
-      category: "recommended",
-      check: (d) => d.projects.length >= 1 && d.projects[0].name.length > 0 && !isPlaceholder(d.projects[0].name),
+      requirementEn: `Add at least ${minProjects} project${minProjects > 1 ? "s" : ""} (Year ${yearCurrent} target)`,
+      requirementAr: `أضف ${minProjects} مشروع${minProjects > 1 ? "ين" : ""} على الأقل (مستهدف سنة ${yearCurrent})`,
+      tipEn: industry === "tech"
+        ? "Most IT recruiters look for project portfolios. Add your GitHub projects."
+        : "Academic or personal projects show initiative.",
+      tipAr: industry === "tech"
+        ? "أغلب مسؤولي التوظيف في التقنية يبحثون عن مشاريع. أضف مشاريعك."
+        : "المشاريع الأكاديمية أو الشخصية تُظهر المبادرة.",
+      weight: industry === "tech" ? 5 : 4,
+      category: "required",
+      check: (d) => {
+        const valid = d.projects.filter(p => p.name.length > 0 && !isPlaceholder(p.name));
+        return valid.length >= minProjects;
+      },
     });
   }
 
-  if (stage === "student") {
-    // minSkills from config
+  // Graduate-specific extras
+  if (stage === "graduate") {
     targets.push({
-      sectionKey: "skills",
-      requirementEn: `List at least ${personaCfg.minSkills} skills`,
-      requirementAr: `أضف ${personaCfg.minSkills} مهارات على الأقل`,
-      tipEn: "Include a mix of technical and soft skills relevant to your field.",
-      tipAr: "أضف مزيجاً من المهارات التقنية والشخصية المتعلقة بتخصصك.",
-      weight: 4,
+      sectionKey: "personal",
+      requirementEn: "Add your LinkedIn profile URL",
+      requirementAr: "أضف رابط حسابك في LinkedIn",
+      tipEn: "LinkedIn is essential for professional networking. 87% of recruiters use it.",
+      tipAr: "LinkedIn أساسي للشبكات المهنية. 87% من المسؤولين يستخدمونه.",
+      weight: 3,
       category: "required",
-      check: (d) => getSkillsList(d).length >= personaCfg.minSkills,
+      check: (d) => (d.linkedin || "").length > 5,
     });
 
-    // 1+ project (higher weight for tech)
     targets.push({
-      sectionKey: "projects",
-      requirementEn: "Add at least 1 project",
-      requirementAr: "أضف مشروع واحد على الأقل",
-      tipEn: industry === "tech"
-        ? "Most IT recruiters look for at least one GitHub project at your level. Click here to add yours."
-        : "Academic or personal projects show initiative. Add any class project or personal work.",
-      tipAr: industry === "tech"
-        ? "أغلب مسؤولي التوظيف في التقنية يبحثون عن مشروع واحد على الأقل. أضف مشروعك الآن."
-        : "المشاريع الأكاديمية أو الشخصية تُظهر المبادرة. أضف أي مشروع دراسي أو شخصي.",
-      weight: industry === "tech" ? 5 : 4,
+      sectionKey: "summary",
+      requirementEn: "Write a detailed summary (60+ characters)",
+      requirementAr: "اكتب ملخصاً مفصلاً (60 حرف+)",
+      tipEn: "Replace all placeholder text with real content.",
+      tipAr: "استبدل النصوص الافتراضية بمحتوى حقيقي.",
+      weight: 3,
       category: "required",
-      check: (d) => d.projects.length >= 1 && d.projects[0].name.length > 0 && !isPlaceholder(d.projects[0].name),
+      check: (d) => {
+        const s = (d.summary || "").trim();
+        return s.length >= 60 && !isPlaceholder(s) && !s.includes("[");
+      },
     });
+  }
 
-    // Recommend GPA
+  // Education — GPA (year 2+)
+  if (yearCurrent >= 2) {
     targets.push({
       sectionKey: "education",
       requirementEn: "Include degree details or GPA",
