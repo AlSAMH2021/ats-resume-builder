@@ -1,14 +1,10 @@
 import { useEffect, useRef, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import PersonalInfoSection from "./PersonalInfoSection";
-import SummarySection from "./SummarySection";
-import ExperienceSection from "./ExperienceSection";
 import EducationSection from "./EducationSection";
-import CertificationsSection from "./CertificationsSection";
-import SkillsSection from "./SkillsSection";
+import SkillsTrainingSection from "./SkillsTrainingSection";
+import ExperienceSection from "./ExperienceSection";
 import LanguagesSection from "./LanguagesSection";
-import ProjectsSection from "./ProjectsSection";
-import ATSKeywordsSection from "./ATSKeywordsSection";
 import SectionProgressBar from "./SectionProgressBar";
 import { Separator } from "@/components/ui/separator";
 import { computeSectionProgress, getNextPrioritySection, type SectionProgress } from "@/lib/careerTargets";
@@ -34,7 +30,6 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
   const onProgressRef = useRef(onProgressUpdate);
   onProgressRef.current = onProgressUpdate;
 
-  // Stabilise by serialising only the fields that matter
   const dataKey = useMemo(() => {
     if (!persona) return "";
     return JSON.stringify({
@@ -53,6 +48,8 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
       langText: data.languages?.map((l) => l.name).join("|"),
       certCount: data.certifications?.length ?? 0,
       certText: data.certifications?.map((c) => c.name).join("|"),
+      courseCount: data.courses?.length ?? 0,
+      courseText: data.courses?.map((c) => c.name).join("|"),
     });
   }, [data, persona]);
 
@@ -71,7 +68,6 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
       if (persona) {
         const next = getNextPrioritySection(sections, persona.stage, persona.goal);
         if (next) {
-          const overall = sections.reduce((s, sec) => s + sec.percent, 0) / sections.length;
           const gain = Math.round(((100 - next.percent) * 100) / (sections.length * 100));
           onNextPriorityRef.current?.({
             sectionKey: next.sectionKey,
@@ -97,31 +93,29 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
 
   return (
     <div className="space-y-5">
+      {/* القسم الأول: معلومات التواصل */}
       <PersonalInfoSection lang={lang} />
       {renderBar("personal")}
       <Separator />
-      <SummarySection lang={lang} />
-      {renderBar("summary")}
-      <Separator />
-      <ExperienceSection lang={lang} />
-      {renderBar("experience")}
-      <Separator />
+
+      {/* القسم الثاني: التعليم الأكاديمي */}
       <EducationSection lang={lang} />
       {renderBar("education")}
       <Separator />
-      <CertificationsSection lang={lang} />
+
+      {/* القسم الثالث: التعليم المهاري */}
+      <SkillsTrainingSection lang={lang} />
       {renderBar("certifications")}
       <Separator />
-      <SkillsSection lang={lang} />
-      {renderBar("skills")}
+
+      {/* القسم الرابع: الخبرات العملية + الإنجازات */}
+      <ExperienceSection lang={lang} />
+      {renderBar("experience")}
       <Separator />
+
+      {/* القسم الخامس: اللغات */}
       <LanguagesSection lang={lang} />
       {renderBar("languages")}
-      <Separator />
-      <ProjectsSection lang={lang} />
-      {renderBar("projects")}
-      <Separator />
-      <ATSKeywordsSection lang={lang} />
     </div>
   );
 }
