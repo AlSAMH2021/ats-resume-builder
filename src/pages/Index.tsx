@@ -211,7 +211,7 @@ const Index = () => {
               )}
               <ResumeForm
                 lang={lang}
-                persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal, yearCurrent: targets.yearCurrent, yearTotal: targets.yearTotal } : null}
                 onProgressUpdate={setSectionProgress}
                 onNextPriorityUpdate={setNextPriority}
               />
