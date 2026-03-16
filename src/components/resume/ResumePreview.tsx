@@ -1,157 +1,226 @@
 import type { ResumeData } from "@/types/resume";
-import type { ResumeTemplate } from "./TemplateSelector";
-import type { ResumeColors } from "./ColorCustomizer";
-import { defaultResumeColors, seeratyOverlayColors } from "./ColorCustomizer";
-import type { ResumeSection } from "./SectionReorder";
-import { defaultSectionOrder } from "./SectionReorder";
 
 interface Props {
   data: ResumeData;
   lang: 'en' | 'ar';
-  template?: ResumeTemplate;
-  colors?: ResumeColors;
-  sectionOrder?: ResumeSection[];
-  seeratyOverlay?: boolean;
 }
 
 const l = (lang: string, en: string, ar: string) => lang === 'ar' ? ar : en;
 
-export default function ResumePreview({ data, lang, template = "starter", colors, sectionOrder, seeratyOverlay = false }: Props) {
-  const baseColors = colors || defaultResumeColors;
-  const c = seeratyOverlay ? seeratyOverlayColors : baseColors;
-  const order = sectionOrder || defaultSectionOrder;
+// Progress dots component (green circles on a line)
+function ProgressDots({ count, max }: { count: number; max: number }) {
+  const total = Math.max(max, count, 1);
+  return (
+    <div className="progress-dots">
+      <div className="progress-dots-line" />
+      {Array.from({ length: total }).map((_, i) => (
+        <div
+          key={i}
+          className={`progress-dot ${i < count ? 'progress-dot-filled' : 'progress-dot-empty'}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Level bar component for languages
+function LevelBar({ level }: { level: string }) {
+  const levelMap: Record<string, number> = {
+    'مبتدئ': 1, 'beginner': 1,
+    'متوسط': 2, 'intermediate': 2,
+    'جيد': 3, 'good': 3,
+    'متقدم': 3, 'advanced': 3,
+    'ممتاز': 4, 'fluent': 4, 'native': 4,
+    'اللغة الأم': 4, 'mother tongue': 4,
+  };
+  const val = levelMap[level.toLowerCase()] || 2;
+  const max = 4;
+  const percent = (val / max) * 100;
+
+  return (
+    <div className="level-bar-container">
+      <div className="level-bar-track">
+        <div className="level-bar-fill" style={{ width: `${percent}%` }} />
+        <span className="level-bar-label-start">{val} Level</span>
+        <span className="level-bar-label-end">{max} Level</span>
+      </div>
+    </div>
+  );
+}
+
+export default function ResumePreview({ data, lang }: Props) {
   const hasContent = (val: string | undefined) => val && val.trim().length > 0;
-  const contactParts = [data.location, data.phone, data.email, data.linkedin, data.website].filter(Boolean);
-  const h2Style = { color: c.headingColor, borderBottomColor: c.lineColor };
-
-  const sections: Record<ResumeSection, JSX.Element | null> = {
-    personal: null, // rendered separately as header
-    summary: hasContent(data.summary) ? (
-      <div key="summary">
-        <h2 style={h2Style}>{l(lang, "PROFESSIONAL SUMMARY", "الملخص المهني")}</h2>
-        <p>{data.summary}</p>
-      </div>
-    ) : null,
-
-    experience: data.experiences?.length > 0 && data.experiences.some(e => hasContent(e.jobTitle) || hasContent(e.company)) ? (
-      <div key="experience">
-        <h2 style={h2Style}>{l(lang, "EXPERIENCE", "الخبرات")}</h2>
-        {data.experiences.map((exp, i) => (
-          <div key={i} style={{ marginBottom: '8pt' }}>
-            <h3>{exp.jobTitle}{exp.company ? ` — ${exp.company}` : ""}</h3>
-            <p style={{ fontSize: '10pt', color: '#555' }}>
-              {[exp.location, exp.startDate && `${exp.startDate} – ${exp.current ? l(lang, 'Present', 'حتى الآن') : exp.endDate || ''}`].filter(Boolean).join("  |  ")}
-            </p>
-            {hasContent(exp.bullets) && (
-              <ul>{exp.bullets!.split("\n").filter(b => b.trim()).map((bullet, j) => <li key={j}>{bullet.trim()}</li>)}</ul>
-            )}
-          </div>
-        ))}
-      </div>
-    ) : null,
-
-    education: data.education?.length > 0 && data.education.some(e => hasContent(e.degree) || hasContent(e.institution)) ? (
-      <div key="education">
-        <h2 style={h2Style}>{l(lang, "EDUCATION", "التعليم")}</h2>
-        {data.education.map((edu, i) => (
-          <div key={i} style={{ marginBottom: '6pt' }}>
-            <h3>{edu.degree}{edu.institution ? ` — ${edu.institution}` : ""}</h3>
-            <p style={{ fontSize: '10pt', color: '#555' }}>
-              {[edu.location, edu.startDate && `${edu.startDate} – ${edu.endDate || ''}`].filter(Boolean).join("  |  ")}
-            </p>
-            {hasContent(edu.description) && <p style={{ fontSize: '10pt' }}>{edu.description}</p>}
-          </div>
-        ))}
-      </div>
-    ) : null,
-
-    certifications: data.certifications?.length > 0 && data.certifications.some(c => hasContent(c.name)) ? (
-      <div key="certifications">
-        <h2 style={h2Style}>{l(lang, "CERTIFICATIONS", "الشهادات")}</h2>
-        {data.certifications.map((cert, i) => (
-          <p key={i}><strong>{cert.name}</strong>{cert.issuer ? ` — ${cert.issuer}` : ""}{cert.date ? ` (${cert.date})` : ""}</p>
-        ))}
-      </div>
-    ) : null,
-
-    skills: hasContent(data.skills) ? (
-      <div key="skills">
-        <h2 style={h2Style}>{l(lang, "SKILLS", "المهارات")}</h2>
-        <p>{data.skills}</p>
-      </div>
-    ) : null,
-
-    languages: data.languages?.length > 0 && data.languages.some(lg => hasContent(lg.name)) ? (
-      <div key="languages">
-        <h2 style={h2Style}>{l(lang, "LANGUAGES", "اللغات")}</h2>
-        <p>{data.languages.filter(lg => lg.name).map(lg => `${lg.name}${lg.level ? ` (${lg.level})` : ""}`).join("  •  ")}</p>
-      </div>
-    ) : null,
-
-    projects: data.projects?.length > 0 && data.projects.some(p => hasContent(p.name)) ? (
-      <div key="projects">
-        <h2 style={h2Style}>{l(lang, "PROJECTS", "المشاريع")}</h2>
-        {data.projects.map((proj, i) => (
-          <div key={i} style={{ marginBottom: '6pt' }}>
-            <h3>{proj.name}</h3>
-            {hasContent(proj.description) && <p style={{ fontSize: '10pt' }}>{proj.description}</p>}
-            {hasContent(proj.url) && <p style={{ fontSize: '9pt', color: '#555' }}>{proj.url}</p>}
-          </div>
-        ))}
-      </div>
-    ) : null,
+  const sectionNum = (n: number) => {
+    const labels: Record<number, { en: string; ar: string }> = {
+      1: { en: "Section One: Contact Information", ar: "القسم الأول : معلومات التواصل" },
+      2: { en: "Section Two: Academic Education", ar: "القسم الثاني: التعليم الأكاديمي" },
+      3: { en: "Section Three: Skills Training", ar: "القسم الثالث: التعليم المهاري" },
+      4: { en: "Section Four: Work Experience", ar: "القسم الرابع: الخبرات العملية" },
+      5: { en: "Section Five: Languages", ar: "القسم الخامس: اللغات" },
+    };
+    return l(lang, labels[n].en, labels[n].ar);
   };
 
-  const templateClass = `resume-${template}`;
-  const overlayClass = seeratyOverlay ? "seeraty-overlay" : "";
+  return (
+    <div className="resume-preview resume-seeraty-v2" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
 
-  // Seeraty overlay wraps any template with branded header + accent bar + watermark
-  if (seeratyOverlay) {
-    return (
-      <div className={`resume-preview ${templateClass} ${overlayClass}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-        {/* Purple accent bar */}
-        <div className="seeraty-accent-bar" style={{ background: `linear-gradient(135deg, ${c.headingColor}, ${c.lineColor})` }} />
+      {/* Section 1: Contact Info */}
+      <div className="rv2-section">
+        <h2 className="rv2-heading">{sectionNum(1)}</h2>
+        <div className="rv2-field">
+          <span className="rv2-label">{l(lang, "Name", "الاسم")}</span>
+          <span className="rv2-colon"> : </span>
+          <span className="rv2-value">{data.fullName || "—"}</span>
+        </div>
+        <div className="rv2-field">
+          <span className="rv2-label">{l(lang, "Email", "الايميل")}</span>
+          <span className="rv2-colon"> : </span>
+          <span className="rv2-value">{data.email || "—"}</span>
+        </div>
+        <div className="rv2-field">
+          <span className="rv2-label">{l(lang, "Phone", "رقم التواصل")}</span>
+          <span className="rv2-colon"> : </span>
+          <span className="rv2-value">{data.phone || "—"}</span>
+        </div>
+      </div>
 
-        {/* Header with name + contact in a branded block */}
-        <div className="seeraty-header">
-          {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
-          {hasContent(data.jobTitle) && <p className="seeraty-job-title">{data.jobTitle}</p>}
-          {contactParts.length > 0 && (
-            <div className="seeraty-contact">
-              {contactParts.map((part, i) => (
-                <span key={i} className="seeraty-contact-item">{part}</span>
-              ))}
+      {/* Section 2: Academic Education */}
+      <div className="rv2-section">
+        <h2 className="rv2-heading">{sectionNum(2)}</h2>
+        {data.education?.length > 0 ? data.education.map((edu, i) => (
+          <div key={i}>
+            <div className="rv2-field">
+              <span className="rv2-label">{l(lang, "Specialization", "التخصص")}</span>
+              <span className="rv2-colon"> : </span>
+              <span className="rv2-value">{edu.degree || "—"}</span>
             </div>
+            <div className="rv2-field">
+              <span className="rv2-label">{l(lang, "University", "الجامعة")}</span>
+              <span className="rv2-colon"> : </span>
+              <span className="rv2-value">{edu.institution || "—"}</span>
+            </div>
+          </div>
+        )) : (
+          <div className="rv2-field">
+            <span className="rv2-label">{l(lang, "Specialization", "التخصص")}</span>
+            <span className="rv2-colon"> : </span>
+            <span className="rv2-value">—</span>
+          </div>
+        )}
+      </div>
+
+      {/* Section 3: Skills Training */}
+      <div className="rv2-section">
+        <h2 className="rv2-heading">{sectionNum(3)}</h2>
+
+        {/* Courses */}
+        <div className="rv2-subsection">
+          <div className="rv2-sub-header">
+            <ProgressDots count={data.certifications?.length || 0} max={4} />
+            <span className="rv2-sub-label">{l(lang, "Training Courses :", "الدورات التدريبية :")}</span>
+          </div>
+          {data.certifications?.length > 0 ? data.certifications.map((cert, i) => (
+            <div key={i} className="rv2-list-item">
+              <span>{l(lang, `Course ${i + 1}`, `دورة ${i + 1}`)}: {cert.name || "....................."}
+              </span>
+            </div>
+          )) : (
+            <>
+              <div className="rv2-list-item">{l(lang, "Course 1", "دورة 1")}: .....................</div>
+              <div className="rv2-list-item">{l(lang, "Course 2", "دورة 2")}: .....................</div>
+            </>
           )}
         </div>
 
-        {/* Sections */}
-        <div className="seeraty-body">
-          {order.map(s => {
-            const section = sections[s];
-            if (!section) return null;
-            return (
-              <div key={s} className="seeraty-section">
-                {section}
-              </div>
-            );
-          })}
-        </div>
+        <div className="rv2-divider" />
 
-        {/* Watermark */}
-        <div className="seeraty-watermark" style={{ color: c.headingColor }}>
-          سيرتي | Seeraty
+        {/* Professional Certifications */}
+        <div className="rv2-subsection">
+          <div className="rv2-sub-header">
+            <ProgressDots count={data.certifications?.filter(c => c.issuer).length || 0} max={3} />
+            <span className="rv2-sub-label">{l(lang, "Professional Certifications :", "الشهادات المهنية :")}</span>
+          </div>
+          {hasContent(data.skills) ? (
+            data.skills!.split(/[,،\n]/).filter(s => s.trim()).map((skill, i) => (
+              <div key={i} className="rv2-list-item">
+                {l(lang, `Certificate ${i + 1}`, `شهادة ${i + 1}`)}: {skill.trim()}
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="rv2-list-item">{l(lang, "Certificate 1", "شهادة 1")}: .....................</div>
+              <div className="rv2-list-item">{l(lang, "Certificate 2", "شهادة 2")}: .....................</div>
+            </>
+          )}
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className={`resume-preview ${templateClass}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {hasContent(data.fullName) && <h1>{data.fullName}</h1>}
-      {hasContent(data.jobTitle) && <p style={{ fontSize: '12pt', marginBottom: '4pt' }}>{data.jobTitle}</p>}
-      {contactParts.length > 0 && <p className="contact-line">{contactParts.join("  |  ")}</p>}
-      {order.map(s => sections[s])}
+      {/* Section 4: Work Experience */}
+      <div className="rv2-section">
+        <h2 className="rv2-heading">{sectionNum(4)}</h2>
+
+        {/* Volunteer Work / Experience */}
+        {data.experiences?.length > 0 ? data.experiences.map((exp, i) => (
+          <div key={i} className="rv2-experience-block">
+            <div className="rv2-exp-header">
+              <span className="rv2-exp-title">{exp.jobTitle || l(lang, "Job Title", "المسمى الوظيفي")}</span>
+              {exp.company && <span className="rv2-exp-org"> {exp.company}{exp.startDate ? ` / ${exp.startDate}` : ""}</span>}
+            </div>
+            {hasContent(exp.bullets) && (
+              <div className="rv2-exp-tasks">
+                {exp.bullets!.split("\n").filter(b => b.trim()).map((bullet, j) => (
+                  <div key={j} className="rv2-list-item">{bullet.trim()}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        )) : (
+          <div className="rv2-exp-placeholder">
+            <div className="rv2-list-item">{l(lang, "Job Title", "المسمى الوظيفي")}: .....................</div>
+          </div>
+        )}
+
+        <div className="rv2-divider" />
+
+        {/* Achievements / Projects */}
+        <div className="rv2-subsection">
+          <div className="rv2-sub-header">
+            <ProgressDots count={data.projects?.length || 0} max={3} />
+            <span className="rv2-sub-label">{l(lang, "Works / Achievements:", "أعمال / إنجازات:")}</span>
+          </div>
+          {data.projects?.length > 0 ? data.projects.map((proj, i) => (
+            <div key={i} className="rv2-list-item">
+              {l(lang, `Work ${i + 1}`, `عمل ${i + 1}`)} : {proj.name}{proj.description ? ` — ${proj.description}` : ""}
+            </div>
+          )) : (
+            <>
+              <div className="rv2-list-item">{l(lang, "Work 1", "عمل 1")} : .....................</div>
+              <div className="rv2-list-item">{l(lang, "Work 2", "عمل 2")} : .....................</div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Section 5: Languages */}
+      <div className="rv2-section">
+        <h2 className="rv2-heading">{sectionNum(5)}</h2>
+        {data.languages?.length > 0 ? data.languages.filter(lg => lg.name).map((lg, i) => (
+          <div key={i} className="rv2-lang-item">
+            <div className="rv2-field">
+              <span className="rv2-label">{i === 0 ? l(lang, "Mother Tongue", "اللغة الأم") : lg.name}</span>
+              <span className="rv2-colon"> : </span>
+              <span className="rv2-value">{i === 0 ? lg.name : ""}</span>
+            </div>
+            {i > 0 && lg.level && <LevelBar level={lg.level} />}
+          </div>
+        )) : (
+          <div className="rv2-field">
+            <span className="rv2-label">{l(lang, "Mother Tongue", "اللغة الأم")}</span>
+            <span className="rv2-colon"> : </span>
+            <span className="rv2-value">—</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
