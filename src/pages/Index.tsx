@@ -276,16 +276,9 @@ const Index = () => {
           {/* Left: Form */}
           <ScrollArea className="h-[calc(100vh-57px)] border-e" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-5" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <TemplateSelector value={template} onChange={handleTemplateChange} lang={lang} seeratyOverlay={seeratyOverlay} onSeeratyOverlayChange={setSeeratyOverlay} />
-              <div className="mt-3">
-                <ColorCustomizer value={colors} onChange={setColors} lang={lang} />
-              </div>
-              <div className="mt-3">
-                <SectionReorder order={sectionOrder} onChange={setSectionOrder} lang={lang} />
-              </div>
               {/* Target Checklist Widget */}
               {targets && sectionProgress.length > 0 && (
-                <div className="mt-4">
+                <div className="mb-4">
                   <TargetChecklist
                     sections={sectionProgress}
                     lang={lang}
@@ -294,14 +287,12 @@ const Index = () => {
                   />
                 </div>
               )}
-              <div className="mt-4">
-                <ResumeForm
-                  lang={lang}
-                  persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
-                  onProgressUpdate={setSectionProgress}
-                  onNextPriorityUpdate={setNextPriority}
-                />
-              </div>
+              <ResumeForm
+                lang={lang}
+                persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                onProgressUpdate={setSectionProgress}
+                onNextPriorityUpdate={setNextPriority}
+              />
             </div>
           </ScrollArea>
 
