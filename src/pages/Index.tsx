@@ -316,7 +316,7 @@ const Index = () => {
 
       {/* Print-only preview */}
       <div className="hidden print-only">
-        <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
+        <ResumePreview data={watchedData} lang={lang} />
       </div>
     </div>
   );
