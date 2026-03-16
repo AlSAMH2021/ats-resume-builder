@@ -19,7 +19,7 @@ interface NextPriority {
 
 interface Props {
   lang: "en" | "ar";
-  persona?: { stage: string; industry: string; goal: string } | null;
+  persona?: { stage: string; industry: string; goal: string; yearCurrent?: number; yearTotal?: number } | null;
   onProgressUpdate?: (sections: SectionProgress[]) => void;
   onNextPriorityUpdate?: (priority: NextPriority | null) => void;
 }

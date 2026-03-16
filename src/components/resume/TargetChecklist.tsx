@@ -26,7 +26,7 @@ interface NextPriority {
 interface Props {
   sections: SectionProgress[];
   lang: "en" | "ar";
-  persona?: { stage: string; industry: string; goal: string } | null;
+  persona?: { stage: string; industry: string; goal: string; yearCurrent?: number; yearTotal?: number } | null;
   nextPriority?: NextPriority | null;
 }
 
