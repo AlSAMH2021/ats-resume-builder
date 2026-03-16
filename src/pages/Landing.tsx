@@ -147,7 +147,7 @@ const Landing = () => {
   const l = (en: string, ar: string) => (lang === "ar" ? ar : en);
   const isRTL = lang === "ar";
 
-  const handleStart = () => navigate("/builder");
+  const handleStart = () => navigate("/auth");
 
   // Navbar scroll detection
   useEffect(() => {
