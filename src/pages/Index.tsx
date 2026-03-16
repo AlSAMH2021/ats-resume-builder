@@ -308,7 +308,7 @@ const Index = () => {
           {/* Right: Preview */}
           <div className="h-[calc(100vh-57px)] overflow-auto bg-muted/50 p-6 flex justify-center">
             <div className="bg-white shadow-lg border w-full max-w-[210mm] min-h-[297mm] p-[15mm] rounded-sm">
-              <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
+              <ResumePreview data={watchedData} lang={lang} />
             </div>
           </div>
         </div>
