@@ -41,7 +41,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-e">
+    <Sidebar collapsible="icon" side="right" className="border-s">
       <SidebarContent>
         <div className="p-3 flex items-center gap-2 border-b">
           <img src={seeratyLogo} alt="سيرتي" className="h-8" />
