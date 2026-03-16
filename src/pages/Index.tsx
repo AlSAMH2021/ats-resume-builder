@@ -276,16 +276,9 @@ const Index = () => {
           {/* Left: Form */}
           <ScrollArea className="h-[calc(100vh-57px)] border-e" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-5" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <TemplateSelector value={template} onChange={handleTemplateChange} lang={lang} seeratyOverlay={seeratyOverlay} onSeeratyOverlayChange={setSeeratyOverlay} />
-              <div className="mt-3">
-                <ColorCustomizer value={colors} onChange={setColors} lang={lang} />
-              </div>
-              <div className="mt-3">
-                <SectionReorder order={sectionOrder} onChange={setSectionOrder} lang={lang} />
-              </div>
               {/* Target Checklist Widget */}
               {targets && sectionProgress.length > 0 && (
-                <div className="mt-4">
+                <div className="mb-4">
                   <TargetChecklist
                     sections={sectionProgress}
                     lang={lang}
@@ -294,21 +287,19 @@ const Index = () => {
                   />
                 </div>
               )}
-              <div className="mt-4">
-                <ResumeForm
-                  lang={lang}
-                  persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
-                  onProgressUpdate={setSectionProgress}
-                  onNextPriorityUpdate={setNextPriority}
-                />
-              </div>
+              <ResumeForm
+                lang={lang}
+                persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal } : null}
+                onProgressUpdate={setSectionProgress}
+                onNextPriorityUpdate={setNextPriority}
+              />
             </div>
           </ScrollArea>
 
           {/* Right: Preview */}
           <div className="h-[calc(100vh-57px)] overflow-auto bg-muted/50 p-6 flex justify-center">
             <div className="bg-white shadow-lg border w-full max-w-[210mm] min-h-[297mm] p-[15mm] rounded-sm">
-              <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
+              <ResumePreview data={watchedData} lang={lang} />
             </div>
           </div>
         </div>
@@ -316,7 +307,7 @@ const Index = () => {
 
       {/* Print-only preview */}
       <div className="hidden print-only">
-        <ResumePreview data={watchedData} lang={lang} template={template} colors={seeratyOverlay ? seeratyOverlayColors : colors} sectionOrder={sectionOrder} seeratyOverlay={seeratyOverlay} />
+        <ResumePreview data={watchedData} lang={lang} />
       </div>
     </div>
   );
