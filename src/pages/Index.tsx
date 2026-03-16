@@ -1,44 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { FileDown, Copy, RotateCcw, FileText, Languages, FileType, Share2, Settings2 } from "lucide-react";
+import { FileDown, Copy, RotateCcw, Languages, FileType, Share2, Settings2 } from "lucide-react";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import TargetChecklist from "@/components/resume/TargetChecklist";
 import type { SectionProgress } from "@/lib/careerTargets";
-import TemplateSelector, { type ResumeTemplate } from "@/components/resume/TemplateSelector";
-import ColorCustomizer, { type ResumeColors, templateDefaultColors, seeratyOverlayColors } from "@/components/resume/ColorCustomizer";
-import SectionReorder, { type ResumeSection, defaultSectionOrder } from "@/components/resume/SectionReorder";
-import OnboardingQuiz, { type OnboardingTargets } from "@/components/resume/OnboardingQuiz";
-import SetupReadyScreen from "@/components/resume/SetupReadyScreen";
+import type { OnboardingTargets } from "@/components/resume/OnboardingQuiz";
 import { resumeSchema, defaultResumeData, type ResumeData } from "@/types/resume";
 import { demoDataEn, demoDataAr } from "@/lib/demoData";
 import { resumeToPlainText } from "@/lib/atsKeywords";
 import { exportToDocx } from "@/lib/exportDocx";
 import { encodeResumeToUrl, decodeResumeFromUrl } from "@/lib/shareResume";
-import { generateSmartSetup, type SmartSetupResult } from "@/lib/smartSetup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
 const STORAGE_KEY = "ats-resume-data";
-const ONBOARDING_KEY = "seeraty-onboarding-done";
 const TARGETS_KEY = "seeraty-targets";
-const TEMPLATE_KEY = "seeraty-template";
-
-// Migration: map old template names to new archetypes
-const migrateTemplate = (t: string): ResumeTemplate => {
-  const map: Record<string, ResumeTemplate> = {
-    classic: "academic",
-    modern: "starter",
-    minimal: "academic",
-    executive: "professional",
-    seeraty: "starter",
-  };
-  return map[t] ?? (["starter", "academic", "professional"].includes(t) ? t as ResumeTemplate : "starter");
-};
 
 function loadSavedData(): ResumeData {
   try {
@@ -48,24 +28,8 @@ function loadSavedData(): ResumeData {
   return defaultResumeData;
 }
 
-function loadSavedTemplate(): ResumeTemplate {
-  try {
-    const saved = localStorage.getItem(TEMPLATE_KEY);
-    if (saved) return migrateTemplate(saved);
-  } catch {}
-  return "starter";
-}
-
 const Index = () => {
-  const navigate = useNavigate();
   const [lang, setLang] = useState<'en' | 'ar'>('ar');
-  const [template, setTemplate] = useState<ResumeTemplate>(loadSavedTemplate);
-  const [colors, setColors] = useState<ResumeColors>(() => templateDefaultColors[loadSavedTemplate()] ?? templateDefaultColors.starter);
-  const [sectionOrder, setSectionOrder] = useState<ResumeSection[]>(defaultSectionOrder);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    return !localStorage.getItem(ONBOARDING_KEY);
-  });
-  const [smartSetup, setSmartSetup] = useState<SmartSetupResult | null>(null);
   const [targets, setTargets] = useState<OnboardingTargets | null>(() => {
     try {
       const saved = localStorage.getItem(TARGETS_KEY);
@@ -75,13 +39,6 @@ const Index = () => {
   const [showTargets, setShowTargets] = useState(false);
   const [sectionProgress, setSectionProgress] = useState<SectionProgress[]>([]);
   const [nextPriority, setNextPriority] = useState<{ sectionKey: string; labelEn: string; labelAr: string; gainPercent: number } | null>(null);
-  const [seeratyOverlay, setSeeratyOverlay] = useState(false);
-
-  const handleTemplateChange = useCallback((t: ResumeTemplate) => {
-    setTemplate(t);
-    setColors(templateDefaultColors[t]);
-    localStorage.setItem(TEMPLATE_KEY, t);
-  }, []);
 
   const form = useForm<ResumeData>({
     resolver: zodResolver(resumeSchema),
@@ -98,7 +55,6 @@ const Index = () => {
       form.reset(shared);
       window.history.replaceState({}, "", window.location.pathname);
       toast.success(lang === 'ar' ? "تم تحميل السيرة من الرابط" : "Resume loaded from shared link");
-      setShowOnboarding(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,32 +69,18 @@ const Index = () => {
     return () => sub.unsubscribe();
   }, [form]);
 
-  const handleOnboardingComplete = useCallback((t: OnboardingTargets) => {
-    setTargets(t);
-    setLang(t.language as 'en' | 'ar');
-    localStorage.setItem(ONBOARDING_KEY, "true");
-    localStorage.setItem(TARGETS_KEY, JSON.stringify(t));
-    // Save persona/stage for downstream use
-    localStorage.setItem("seeraty-persona", t.stage);
-    setShowOnboarding(false);
-    const setup = generateSmartSetup(t);
-    setSmartSetup(setup);
-  }, []);
-
-  const handleSetupOpen = useCallback(() => {
-    if (!smartSetup) return;
-    // Apply template, section order, colors, and pre-filled data
-    setTemplate(smartSetup.template as ResumeTemplate);
-    setColors(templateDefaultColors[smartSetup.template] ?? templateDefaultColors.starter);
-    setSectionOrder(smartSetup.sectionOrder as ResumeSection[]);
-    form.reset(smartSetup.prefilled);
-    setSmartSetup(null);
-    toast.success(lang === 'ar' ? "تم إعداد سيرتك الذاتية — ابدأ التعديل!" : "Your CV is ready — start editing!");
-  }, [smartSetup, form, lang]);
-
-  const handleOnboardingSkip = useCallback(() => {
-    localStorage.setItem(ONBOARDING_KEY, "true");
-    setShowOnboarding(false);
+  // Listen for targets changes (from onboarding in ProtectedLayout)
+  useEffect(() => {
+    const handler = () => {
+      try {
+        const saved = localStorage.getItem(TARGETS_KEY);
+        setTargets(saved ? JSON.parse(saved) : null);
+      } catch {}
+    };
+    window.addEventListener("storage", handler);
+    // Also check on mount
+    handler();
+    return () => window.removeEventListener("storage", handler);
   }, []);
 
   const handleDemoData = useCallback(() => {
@@ -159,12 +101,12 @@ const Index = () => {
 
   const handleExportDocx = useCallback(async () => {
     try {
-      await exportToDocx(watchedData, lang, sectionOrder);
+      await exportToDocx(watchedData, lang, []);
       toast.success(lang === 'ar' ? "تم تصدير ملف Word" : "Word file exported");
     } catch {
       toast.error(lang === 'ar' ? "فشل التصدير" : "Export failed");
     }
-  }, [watchedData, lang, sectionOrder]);
+  }, [watchedData, lang]);
 
   const handleCopyText = useCallback(async () => {
     const text = resumeToPlainText(watchedData, lang);
@@ -191,15 +133,6 @@ const Index = () => {
   }, []);
 
   const l = (en: string, ar: string) => lang === 'ar' ? ar : en;
-
-  if (showOnboarding) {
-    return <OnboardingQuiz lang={lang} onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />;
-  }
-
-  if (smartSetup) {
-    return <SetupReadyScreen setup={smartSetup} lang={lang} onOpen={handleSetupOpen} />;
-  }
-
 
   return (
     <div className="min-h-screen bg-background" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -255,17 +188,6 @@ const Index = () => {
             <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.stage}</span>
             <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.industry}</span>
             <span className="text-xs bg-primary/10 text-primary rounded-full px-3 py-1">{targets.goal}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs"
-              onClick={() => {
-                localStorage.removeItem(ONBOARDING_KEY);
-                setShowOnboarding(true);
-              }}
-            >
-              {l("Edit Targets", "تعديل المستهدفات")}
-            </Button>
           </div>
         </div>
       )}
