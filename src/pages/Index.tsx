@@ -198,17 +198,7 @@ const Index = () => {
           {/* Left: Form */}
           <ScrollArea className="h-[calc(100vh-57px)] border-e" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
             <div className="p-5" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              {/* Target Checklist Widget */}
-              {targets && sectionProgress.length > 0 && (
-                <div className="mb-4">
-                  <TargetChecklist
-                    sections={sectionProgress}
-                    lang={lang}
-                    persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal, yearCurrent: targets.yearCurrent, yearTotal: targets.yearTotal } : null}
-                    nextPriority={nextPriority}
-                  />
-                </div>
-              )}
+
               <ResumeForm
                 lang={lang}
                 persona={targets ? { stage: targets.stage, industry: targets.industry, goal: targets.goal, yearCurrent: targets.yearCurrent, yearTotal: targets.yearTotal } : null}
