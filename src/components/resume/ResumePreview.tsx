@@ -8,149 +8,149 @@ interface Props {
 const l = (lang: string, en: string, ar: string) => lang === 'ar' ? ar : en;
 
 export default function ResumePreview({ data, lang }: Props) {
-  const hasContent = (val: string | undefined) => val && val.trim().length > 0;
+  const has = (val: string | undefined) => val && val.trim().length > 0;
+
+  const contactParts: string[] = [];
+  if (has(data.email)) contactParts.push(data.email!);
+  if (has(data.phone)) contactParts.push(data.phone!);
+  if (has(data.linkedin)) contactParts.push(data.linkedin!);
+  if (has(data.location)) contactParts.push(data.location!);
 
   return (
-    <div className="resume-preview" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div
+      className="resume-preview font-[Georgia,serif] text-[11pt] leading-[1.5] text-black"
+      dir={lang === 'ar' ? 'rtl' : 'ltr'}
+      style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+    >
+      {/* Header: Name + Contact inline */}
+      {(has(data.fullName) || contactParts.length > 0) && (
+        <header className="text-center mb-4 pb-2 border-b border-black">
+          {has(data.fullName) && (
+            <h1 className="text-[18pt] font-bold uppercase tracking-wide mb-1">
+              {data.fullName}
+            </h1>
+          )}
+          {contactParts.length > 0 && (
+            <p className="text-[10pt] text-gray-700">
+              {contactParts.join("  |  ")}
+            </p>
+          )}
+        </header>
+      )}
 
-      {/* القسم الأول: معلومات التواصل */}
-      <section className="rv2-section">
-        <h2 className="rv2-heading">
-          {l(lang, "Contact Information", "معلومات التواصل")}
-        </h2>
-        {hasContent(data.fullName) && (
-          <p className="rv2-field-line">
-            <strong>{l(lang, "Name", "الاسم")}</strong>: {data.fullName}
-          </p>
-        )}
-        {hasContent(data.email) && (
-          <p className="rv2-field-line">
-            <strong>{l(lang, "Email", "الايميل")}</strong>: {data.email}
-          </p>
-        )}
-        {hasContent(data.phone) && (
-          <p className="rv2-field-line">
-            <strong>{l(lang, "Phone", "رقم التواصل")}</strong>: {data.phone}
-          </p>
-        )}
-      </section>
-
-      {/* القسم الثاني: التعليم الأكاديمي */}
-      {data.education?.some(e => hasContent(e.degree) || hasContent(e.institution)) && (
-        <section className="rv2-section">
-          <h2 className="rv2-heading">
-            {l(lang, "Academic Education", "التعليم الأكاديمي")}
+      {/* EDUCATION */}
+      {data.education?.some(e => has(e.degree) || has(e.institution)) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "EDUCATION", "التعليم")}
           </h2>
-          {data.education.filter(e => hasContent(e.degree) || hasContent(e.institution)).map((edu, i) => (
-            <div key={i} className="rv2-block">
-              {hasContent(edu.degree) && (
-                <p className="rv2-field-line">
-                  <strong>{l(lang, "Specialization", "التخصص")}</strong>: {edu.degree}
-                </p>
-              )}
-              {hasContent(edu.institution) && (
-                <p className="rv2-field-line">
-                  <strong>{l(lang, "University", "الجامعة")}</strong>: {edu.institution}
-                </p>
+          {data.education.filter(e => has(e.degree) || has(e.institution)).map((edu, i) => (
+            <div key={i} className="mb-1.5">
+              <div className="flex justify-between items-baseline flex-wrap">
+                <p className="font-bold text-[11pt]">{edu.degree}</p>
+                {(edu.startDate || edu.endDate) && (
+                  <span className="text-[10pt] text-gray-600">
+                    {edu.startDate}{edu.endDate && ` – ${edu.endDate}`}
+                  </span>
+                )}
+              </div>
+              {has(edu.institution) && (
+                <p className="text-[10.5pt] italic">{edu.institution}</p>
               )}
             </div>
           ))}
         </section>
       )}
 
-      {/* القسم الثالث: التعليم المهاري */}
-      {(data.courses?.some(c => hasContent(c.name)) || data.certifications?.some(c => hasContent(c.name))) && (
-        <section className="rv2-section">
-          <h2 className="rv2-heading">
-            {l(lang, "Skills Training", "التعليم المهاري")}
+      {/* PROFESSIONAL EXPERIENCE */}
+      {data.experiences?.some(e => has(e.jobTitle) || has(e.company)) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "PROFESSIONAL EXPERIENCE", "الخبرات المهنية")}
           </h2>
-
-          {/* الدورات */}
-          {data.courses?.some(c => hasContent(c.name)) && (
-            <div className="rv2-block">
-              <p className="rv2-sub-title">
-                <strong>{l(lang, "Training Courses", "الدورات التدريبية")}</strong>
-              </p>
-              {data.courses.filter(c => hasContent(c.name)).map((course, i) => (
-                <p key={i} className="rv2-list-line">
-                  {l(lang, `Course ${i + 1}`, `دورة ${i + 1}`)}: {course.name}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {/* الشهادات */}
-          {data.certifications?.some(c => hasContent(c.name)) && (
-            <div className="rv2-block">
-              <p className="rv2-sub-title">
-                <strong>{l(lang, "Professional Certifications", "الشهادات المهنية")}</strong>
-              </p>
-              {data.certifications.filter(c => hasContent(c.name)).map((cert, i) => (
-                <p key={i} className="rv2-list-line">
-                  {l(lang, `Certificate ${i + 1}`, `شهادة ${i + 1}`)}: {cert.name}
-                  {hasContent(cert.issuer) && ` — ${cert.issuer}`}
-                </p>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* القسم الرابع: الخبرات العملية */}
-      {(data.experiences?.some(e => hasContent(e.jobTitle) || hasContent(e.company)) || data.projects?.some(p => hasContent(p.name))) && (
-        <section className="rv2-section">
-          <h2 className="rv2-heading">
-            {l(lang, "Work Experience", "الخبرات العملية")}
-          </h2>
-
-          {data.experiences?.filter(e => hasContent(e.jobTitle) || hasContent(e.company)).map((exp, i) => (
-            <div key={i} className="rv2-block">
-              <p className="rv2-exp-title-line">
-                <strong>{exp.jobTitle}</strong>
-                {exp.company && ` — ${exp.company}`}
-                {exp.startDate && ` / ${exp.startDate}`}
-                {exp.endDate && ` - ${exp.endDate}`}
-                {exp.current && ` - ${l(lang, "Present", "حتى الآن")}`}
-              </p>
-              {hasContent(exp.bullets) && (
-                <div className="rv2-bullets">
+          {data.experiences.filter(e => has(e.jobTitle) || has(e.company)).map((exp, i) => (
+            <div key={i} className="mb-2">
+              <div className="flex justify-between items-baseline flex-wrap">
+                <p className="font-bold text-[11pt]">{exp.jobTitle}</p>
+                <span className="text-[10pt] text-gray-600">
+                  {exp.startDate && exp.startDate}
+                  {(exp.endDate || exp.current) && ` – ${exp.current ? l(lang, "Present", "حتى الآن") : exp.endDate}`}
+                </span>
+              </div>
+              {has(exp.company) && (
+                <p className="text-[10.5pt] italic">{exp.company}{has(exp.location) && `, ${exp.location}`}</p>
+              )}
+              {has(exp.bullets) && (
+                <ul className="mt-0.5 list-disc ms-5 text-[10.5pt]">
                   {exp.bullets!.split("\n").filter(b => b.trim()).map((bullet, j) => (
-                    <p key={j} className="rv2-list-line">• {bullet.trim()}</p>
+                    <li key={j}>{bullet.trim()}</li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           ))}
-
-          {/* الإنجازات */}
-          {data.projects?.some(p => hasContent(p.name)) && (
-            <div className="rv2-block">
-              <p className="rv2-sub-title">
-                <strong>{l(lang, "Achievements", "أعمال / إنجازات")}</strong>
-              </p>
-              {data.projects.filter(p => hasContent(p.name)).map((proj, i) => (
-                <p key={i} className="rv2-list-line">
-                  {l(lang, `${i + 1}.`, `${i + 1}.`)} {proj.name}
-                  {hasContent(proj.description) && ` — ${proj.description}`}
-                </p>
-              ))}
-            </div>
-          )}
         </section>
       )}
 
-      {/* القسم الخامس: اللغات */}
-      {data.languages?.some(lg => hasContent(lg.name)) && (
-        <section className="rv2-section">
-          <h2 className="rv2-heading">
-            {l(lang, "Languages", "اللغات")}
+      {/* PROJECTS & ACHIEVEMENTS */}
+      {data.projects?.some(p => has(p.name)) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "PROJECTS", "المشاريع والإنجازات")}
           </h2>
-          {data.languages.filter(lg => hasContent(lg.name)).map((lg, i) => (
-            <p key={i} className="rv2-field-line">
-              <strong>{lg.name}</strong>
-              {lg.level && ` — ${lg.level}`}
+          {data.projects.filter(p => has(p.name)).map((proj, i) => (
+            <div key={i} className="mb-1">
+              <p className="text-[10.5pt]">
+                <span className="font-bold">{proj.name}</span>
+                {has(proj.description) && ` — ${proj.description}`}
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* CERTIFICATIONS & TRAINING */}
+      {(data.certifications?.some(c => has(c.name)) || data.courses?.some(c => has(c.name))) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "CERTIFICATIONS & TRAINING", "الشهادات والتدريب")}
+          </h2>
+          {data.certifications?.filter(c => has(c.name)).map((cert, i) => (
+            <p key={`cert-${i}`} className="text-[10.5pt] mb-0.5">
+              <span className="font-bold">{cert.name}</span>
+              {has(cert.issuer) && ` — ${cert.issuer}`}
+              {has(cert.date) && ` (${cert.date})`}
             </p>
           ))}
+          {data.courses?.filter(c => has(c.name)).map((course, i) => (
+            <p key={`course-${i}`} className="text-[10.5pt] mb-0.5">
+              {course.name}
+            </p>
+          ))}
+        </section>
+      )}
+
+      {/* SKILLS */}
+      {has(data.skills) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "SKILLS", "المهارات")}
+          </h2>
+          <p className="text-[10.5pt]">{data.skills}</p>
+        </section>
+      )}
+
+      {/* LANGUAGES */}
+      {data.languages?.some(lg => has(lg.name)) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "LANGUAGES", "اللغات")}
+          </h2>
+          <p className="text-[10.5pt]">
+            {data.languages.filter(lg => has(lg.name)).map(lg =>
+              `${lg.name}${lg.level ? ` (${lg.level})` : ''}`
+            ).join("  •  ")}
+          </p>
         </section>
       )}
     </div>
