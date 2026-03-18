@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   FileText, Target, TrendingUp, AlertCircle,
-  Sparkles, Shield, GraduationCap, Wrench
+  Sparkles, Shield, GraduationCap, Wrench, Lightbulb
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -177,6 +177,58 @@ const Dashboard = () => {
               <SectionCard key={sec.key} sec={sec} />
             ))}
           </div>
+
+          {/* Smart Tips */}
+          {(() => {
+            const tips: { icon: React.ReactNode; text: string; action: string }[] = [];
+            const sorted = [...sections].sort((a, b) => (a.score / a.maxScore) - (b.score / b.maxScore));
+            
+            for (const sec of sorted) {
+              const pct = Math.round((sec.score / sec.maxScore) * 100);
+              if (pct >= 80) continue;
+              
+              const tipMap: Record<string, string> = {
+                personal: pct === 0 ? "أضف معلوماتك الشخصية الأساسية: الاسم، المسمى الوظيفي، البريد، الهاتف، والمدينة" : "أكمل بيانات التواصل الناقصة لتسهيل وصول أصحاب العمل إليك",
+                summary: pct === 0 ? "اكتب ملخصاً مهنياً يبرز أهم مهاراتك وأهدافك بأكثر من 100 حرف" : "طوّر ملخصك المهني ليكون أكثر تفصيلاً وتأثيراً (100+ حرف)",
+                experience: pct === 0 ? "أضف خبراتك العملية أو التطوعية حتى لو كانت بسيطة" : "أضف المزيد من الخبرات مع وصف إنجازاتك بأرقام ونتائج ملموسة",
+                education: pct === 0 ? "أضف مؤهلاتك التعليمية: الجامعة، التخصص، وسنة التخرج" : "أكمل تفاصيل تعليمك وأضف أي شهادات إضافية حصلت عليها",
+                skills: pct === 0 ? "أضف مهاراتك التقنية والشخصية التي تميزك عن غيرك" : "أضف مهارات إضافية مطلوبة في مجالك لتعزيز فرصك",
+              };
+
+              tips.push({
+                icon: sec.icon,
+                text: tipMap[sec.key] || "حسّن هذا القسم",
+                action: sec.label,
+              });
+              if (tips.length >= 3) break;
+            }
+
+            if (tips.length === 0) return null;
+
+            return (
+              <Card className="p-5 space-y-3 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+                <h2 className="text-base font-semibold flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-500" />
+                  نصائح ذكية لتحسين سيرتك
+                </h2>
+                <div className="space-y-2.5">
+                  {tips.map((tip, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-card/60 border border-border/50">
+                      <span className="mt-0.5 text-primary shrink-0">{tip.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-medium text-primary">{tip.action}</span>
+                        <p className="text-sm text-foreground mt-0.5">{tip.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/builder")} className="gap-2 w-full sm:w-auto">
+                  <FileText className="h-3.5 w-3.5" />
+                  تعديل السيرة الآن
+                </Button>
+              </Card>
+            );
+          })()}
 
           {/* Targets */}
           {targets && (
