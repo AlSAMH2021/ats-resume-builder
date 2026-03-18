@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   FileText, Target, TrendingUp, AlertCircle,
-  Sparkles, Shield, GraduationCap, Wrench
+  Sparkles, Shield, GraduationCap, Wrench, Lightbulb
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
