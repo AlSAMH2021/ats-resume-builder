@@ -2,149 +2,158 @@ import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
-  Target, CheckCircle2, AlertCircle, ArrowLeft,
-  Sparkles, TrendingUp, RefreshCw
+  Target, AlertCircle, Sparkles, RefreshCw, ArrowLeft,
+  CheckCircle2, GraduationCap, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { generateYearPlans, type YearPlan } from "@/lib/yearMilestones";
 
 const TARGETS_KEY = "seeraty-targets";
-const ONBOARDING_KEY = "seeraty-onboarding-done";
+const ONBOARDING_KEY_PREFIX = "seeraty-onboarding-done-";
 const STORAGE_KEY = "ats-resume-data";
 
-interface TargetItem {
-  id: string;
+interface TargetsData {
+  stage: string;
+  industry: string;
+  goal: string;
+  yearCurrent: number;
+  yearTotal: number;
+  language?: string;
+}
+
+// ── Year node on the timeline ──
+function TimelineNode({
+  year,
+  label,
+  isCurrent,
+  isPast,
+  isSelected,
+  onClick,
+}: {
+  year: number;
   label: string;
-  category: "required" | "recommended" | "bonus";
-  met: boolean;
-  tip: string;
+  isCurrent: boolean;
+  isPast: boolean;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-2 group relative"
+    >
+      {/* Circle */}
+      <div
+        className={cn(
+          "w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300",
+          isSelected
+            ? "border-primary bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/30"
+            : isCurrent
+              ? "border-primary bg-primary/10 text-primary"
+              : isPast
+                ? "border-green-500 bg-green-500/10 text-green-600"
+                : "border-muted-foreground/30 bg-muted/50 text-muted-foreground"
+        )}
+      >
+        {isPast && !isSelected ? (
+          <CheckCircle2 className="w-5 h-5 text-green-600" />
+        ) : (
+          <span>{year}</span>
+        )}
+      </div>
+      {/* Label */}
+      <span
+        className={cn(
+          "text-xs font-medium transition-colors whitespace-nowrap",
+          isSelected ? "text-primary" : isCurrent ? "text-primary" : isPast ? "text-green-600" : "text-muted-foreground"
+        )}
+      >
+        {label}
+      </span>
+      {/* Current badge */}
+      {isCurrent && (
+        <Badge variant="default" className="absolute -top-3 text-[10px] px-1.5 py-0">
+          أنت هنا
+        </Badge>
+      )}
+    </button>
+  );
+}
+
+// ── Milestone card ──
+function MilestoneCard({ icon, label, category }: { icon: string; label: string; category: string }) {
+  const catColors: Record<string, string> = {
+    skills: "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-300",
+    projects: "bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-300",
+    experience: "bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-300",
+    certifications: "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-300",
+    languages: "bg-cyan-500/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-300",
+    personal: "bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-300",
+  };
+
+  const catLabels: Record<string, string> = {
+    skills: "مهارات",
+    projects: "مشاريع",
+    experience: "خبرات",
+    certifications: "شهادات",
+    languages: "لغات",
+    personal: "شخصي",
+  };
+
+  return (
+    <div className={cn(
+      "flex items-center gap-3 p-3 rounded-xl border transition-all hover:shadow-sm",
+      catColors[category] ?? "bg-muted/50 border-border"
+    )}>
+      <span className="text-xl shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium">{label}</p>
+      </div>
+      <Badge variant="outline" className="text-[10px] shrink-0">
+        {catLabels[category] ?? category}
+      </Badge>
+    </div>
+  );
 }
 
 const Targets = () => {
   const navigate = useNavigate();
 
-  const [targets] = useState(() => {
+  const targets: TargetsData | null = useMemo(() => {
     try {
       const saved = localStorage.getItem(TARGETS_KEY);
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
-  });
+  }, []);
 
-  const { targetItems, overallPercent } = useMemo(() => {
-    let resumeData: any = null;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) resumeData = JSON.parse(saved);
-    } catch {}
-
-    if (!resumeData || !targets) {
-      return { targetItems: [], overallPercent: 0 };
-    }
-
-    const items: TargetItem[] = [
-      {
-        id: "name",
-        label: "الاسم الكامل",
-        category: "required",
-        met: !!(resumeData.fullName?.trim()),
-        tip: "أضف اسمك الكامل في القسم الشخصي",
-      },
-      {
-        id: "jobTitle",
-        label: "المسمى الوظيفي",
-        category: "required",
-        met: !!(resumeData.jobTitle?.trim()),
-        tip: "حدد المسمى الوظيفي المستهدف",
-      },
-      {
-        id: "email",
-        label: "البريد الإلكتروني",
-        category: "required",
-        met: !!(resumeData.email?.trim()),
-        tip: "أضف بريدك الإلكتروني",
-      },
-      {
-        id: "phone",
-        label: "رقم الهاتف",
-        category: "required",
-        met: !!(resumeData.phone?.trim()),
-        tip: "أضف رقم هاتفك",
-      },
-      {
-        id: "summary",
-        label: "الملخص المهني (٥٠+ كلمة)",
-        category: "required",
-        met: (resumeData.summary || "").trim().split(/\s+/).length >= 50,
-        tip: "اكتب ملخصاً مهنياً لا يقل عن 50 كلمة",
-      },
-      {
-        id: "experience",
-        label: "خبرة عمل واحدة على الأقل",
-        category: "recommended",
-        met: (resumeData.experience || []).length >= 1,
-        tip: "أضف خبراتك العملية السابقة",
-      },
-      {
-        id: "education",
-        label: "مؤهل تعليمي واحد على الأقل",
-        category: "recommended",
-        met: (resumeData.education || []).length >= 1,
-        tip: "أضف مؤهلاتك التعليمية",
-      },
-      {
-        id: "skills3",
-        label: "٣ مهارات على الأقل",
-        category: "recommended",
-        met: (resumeData.skills || []).length >= 3,
-        tip: "أضف المهارات المتعلقة بمجالك",
-      },
-      {
-        id: "skills5",
-        label: "٥ مهارات أو أكثر",
-        category: "bonus",
-        met: (resumeData.skills || []).length >= 5,
-        tip: "أضف المزيد من المهارات للتميز",
-      },
-      {
-        id: "projects",
-        label: "مشروع واحد على الأقل",
-        category: "bonus",
-        met: (resumeData.projects || []).length >= 1,
-        tip: "أضف مشاريعك لإبراز خبراتك العملية",
-      },
-      {
-        id: "certifications",
-        label: "شهادة مهنية",
-        category: "bonus",
-        met: (resumeData.certifications || []).length >= 1,
-        tip: "أضف شهاداتك المهنية إن وجدت",
-      },
-    ];
-
-    const metCount = items.filter(i => i.met).length;
-    const percent = Math.round((metCount / items.length) * 100);
-
-    return { targetItems: items, overallPercent: percent };
+  const yearPlans = useMemo(() => {
+    if (!targets) return [];
+    return generateYearPlans(targets.yearTotal || 4, targets.industry || "other");
   }, [targets]);
 
+  const [selectedYear, setSelectedYear] = useState(() => targets?.yearCurrent ?? 1);
+
+  const selectedPlan: YearPlan | undefined = yearPlans.find(p => p.year === selectedYear);
+
   const handleResetTargets = useCallback(() => {
-    localStorage.removeItem(ONBOARDING_KEY);
+    // Clear all onboarding keys
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(ONBOARDING_KEY_PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    }
     localStorage.removeItem(TARGETS_KEY);
     toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان عند فتح البيلدر");
     navigate("/builder");
   }, [navigate]);
 
-  const categoryLabel = (c: string) =>
-    c === "required" ? "مطلوب" : c === "recommended" ? "موصى به" : "إضافي";
-
-  const categoryColor = (c: string) =>
-    c === "required" ? "destructive" : c === "recommended" ? "default" : "secondary";
-
+  // ── No targets yet ──
   if (!targets) {
     return (
       <div className="p-6 max-w-3xl mx-auto text-center space-y-4" dir="rtl">
@@ -159,21 +168,20 @@ const Targets = () => {
     );
   }
 
-  const grouped = {
-    required: targetItems.filter(i => i.category === "required"),
-    recommended: targetItems.filter(i => i.category === "recommended"),
-    bonus: targetItems.filter(i => i.category === "bonus"),
-  };
+  const { yearCurrent, yearTotal } = targets;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6" dir="rtl">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6" dir="rtl">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Target className="h-6 w-6 text-primary" />
-            المستهدفات المهنية
+            خارطة المستهدفات
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">تتبع تقدمك نحو سيرة ذاتية مثالية</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            مسيرتك الأكاديمية من السنة ١ إلى التخرج
+          </p>
         </div>
         <Button variant="outline" size="sm" onClick={handleResetTargets} className="gap-2">
           <RefreshCw className="h-3.5 w-3.5" />
@@ -181,74 +189,133 @@ const Targets = () => {
         </Button>
       </div>
 
-      {/* Current Targets */}
-      <Card className="p-4">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm font-medium">أهدافك:</span>
-          <Badge variant="outline">{targets.stage}</Badge>
+      {/* Current status card */}
+      <Card className="p-4 bg-gradient-to-l from-primary/5 to-transparent border-primary/20">
+        <div className="flex flex-wrap gap-3 items-center">
+          <GraduationCap className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium">السنة {yearCurrent} من {yearTotal}</span>
           <Badge variant="outline">{targets.industry}</Badge>
           <Badge variant="outline">{targets.goal}</Badge>
         </div>
       </Card>
 
-      {/* Overall Progress */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            نسبة الإنجاز
-          </h2>
-          <span className={cn(
-            "text-2xl font-bold",
-            overallPercent >= 70 ? "text-green-600" : overallPercent >= 40 ? "text-yellow-600" : "text-destructive"
-          )}>
-            {overallPercent}%
-          </span>
-        </div>
-        <Progress value={overallPercent} className="h-3" />
-      </Card>
+      {/* ── Timeline ── */}
+      <div className="relative">
+        <Card className="p-6 overflow-hidden">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              disabled={selectedYear <= 1}
+              onClick={() => setSelectedYear(y => Math.max(1, y - 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
 
-      {/* Target Groups */}
-      {(["required", "recommended", "bonus"] as const).map((cat) => (
-        <div key={cat} className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-            <Badge variant={categoryColor(cat)}>{categoryLabel(cat)}</Badge>
-            <span>{grouped[cat].filter(i => i.met).length}/{grouped[cat].length}</span>
-          </h3>
-          <div className="grid gap-2">
-            {grouped[cat].map((item) => (
-              <Card
-                key={item.id}
-                className={cn(
-                  "p-3 flex items-center gap-3 transition-colors",
-                  item.met ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900" : ""
-                )}
-              >
-                {item.met ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-muted-foreground shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className={cn("text-sm font-medium", item.met && "line-through text-muted-foreground")}>
-                    {item.label}
-                  </p>
-                  {!item.met && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.tip}</p>
+            <div className="flex items-center gap-0 overflow-x-auto px-2 py-4">
+              {yearPlans.map((plan, idx) => (
+                <div key={plan.year} className="flex items-center">
+                  <TimelineNode
+                    year={plan.year}
+                    label={plan.titleAr}
+                    isCurrent={plan.year === yearCurrent}
+                    isPast={plan.year < yearCurrent}
+                    isSelected={plan.year === selectedYear}
+                    onClick={() => setSelectedYear(plan.year)}
+                  />
+                  {idx < yearPlans.length - 1 && (
+                    <div
+                      className={cn(
+                        "h-0.5 w-8 md:w-16 mx-1 transition-colors",
+                        plan.year < yearCurrent ? "bg-green-500" : "bg-muted-foreground/20"
+                      )}
+                    />
                   )}
                 </div>
-              </Card>
+              ))}
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              disabled={selectedYear >= yearTotal}
+              onClick={() => setSelectedYear(y => Math.min(yearTotal, y + 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      {/* ── Selected Year Details ── */}
+      {selectedPlan && (
+        <div className="space-y-4">
+          {/* Year header */}
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold",
+              selectedYear === yearCurrent
+                ? "bg-primary text-primary-foreground"
+                : selectedYear < yearCurrent
+                  ? "bg-green-500 text-white"
+                  : "bg-muted text-muted-foreground"
+            )}>
+              {selectedPlan.year}
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-foreground">
+                السنة {selectedPlan.year} — {selectedPlan.titleAr}
+              </h2>
+              <p className="text-sm text-muted-foreground">{selectedPlan.descriptionAr}</p>
+            </div>
+            {selectedYear < yearCurrent && (
+              <Badge className="bg-green-500/10 text-green-600 border-green-500/30 ms-auto">
+                <CheckCircle2 className="w-3 h-3 me-1" />
+                مرحلة سابقة
+              </Badge>
+            )}
+            {selectedYear === yearCurrent && (
+              <Badge className="bg-primary/10 text-primary border-primary/30 ms-auto">
+                المرحلة الحالية
+              </Badge>
+            )}
+            {selectedYear > yearCurrent && (
+              <Badge variant="secondary" className="ms-auto">
+                مرحلة قادمة
+              </Badge>
+            )}
+          </div>
+
+          {/* Milestones grid */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {selectedPlan.milestones.map((m) => (
+              <MilestoneCard
+                key={m.id}
+                icon={m.icon}
+                label={m.labelAr}
+                category={m.category}
+              />
             ))}
           </div>
-        </div>
-      ))}
 
-      <div className="flex gap-3 pt-2">
-        <Button onClick={() => navigate("/builder")} className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          تعديل السيرة لتحسين النتيجة
-        </Button>
-      </div>
+          {/* CTA */}
+          {selectedYear === yearCurrent && (
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="text-sm font-medium text-foreground">
+                  ابدأ بتحقيق مستهدفات السنة {yearCurrent} الآن
+                </p>
+                <Button onClick={() => navigate("/builder")} className="gap-2" size="sm">
+                  <ArrowLeft className="h-4 w-4" />
+                  فتح البيلدر
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
     </div>
   );
 };
