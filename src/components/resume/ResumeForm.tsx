@@ -7,7 +7,7 @@ import ExperienceSection from "./ExperienceSection";
 import LanguagesSection from "./LanguagesSection";
 import SectionProgressBar from "./SectionProgressBar";
 import { Separator } from "@/components/ui/separator";
-import { computeSectionProgress, getNextPrioritySection, type SectionProgress } from "@/lib/careerTargets";
+import { computeSectionProgress, computeYearSegments, getNextPrioritySection, type SectionProgress, type YearSegment } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
 
 interface NextPriority {
@@ -59,6 +59,18 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataKey, persona]);
 
+  // Compute year segments for each section
+  const yearSegmentsMap = useMemo(() => {
+    if (!persona || !dataKey || !persona.yearTotal) return {} as Record<string, YearSegment[]>;
+    const map: Record<string, YearSegment[]> = {};
+    const sectionKeys = ["personal", "education", "certifications", "experience", "languages", "skills", "projects", "summary"];
+    for (const key of sectionKeys) {
+      map[key] = computeYearSegments(data, persona, key);
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataKey, persona]);
+
   const onNextPriorityRef = useRef(onNextPriorityUpdate);
   onNextPriorityRef.current = onNextPriorityUpdate;
 
@@ -88,7 +100,14 @@ export default function ResumeForm({ lang, persona, onProgressUpdate, onNextPrio
   const renderBar = (key: string) => {
     const progress = getProgress(key);
     if (!progress) return null;
-    return <SectionProgressBar progress={progress} lang={lang} />;
+    return (
+      <SectionProgressBar
+        progress={progress}
+        lang={lang}
+        yearSegments={yearSegmentsMap[key]}
+        yearCurrent={persona?.yearCurrent}
+      />
+    );
   };
 
   return (

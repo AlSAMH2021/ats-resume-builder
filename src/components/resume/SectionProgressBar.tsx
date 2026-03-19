@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { SectionProgress } from "@/lib/careerTargets";
+import type { YearSegment } from "@/lib/careerTargets";
 
 interface Props {
   progress: SectionProgress;
   lang: "en" | "ar";
   feedbackMessage?: { en: string; ar: string };
+  yearSegments?: YearSegment[];
+  yearCurrent?: number;
 }
 
 function WeightDots({ weight, className }: { weight: number; className?: string }) {
@@ -67,7 +70,77 @@ function getTier(percent: number, lang: "en" | "ar") {
   return { label: lang === "ar" ? "يحتاج تحسين" : "Needs Work", color: "text-destructive", icon: null };
 }
 
-export default function SectionProgressBar({ progress, lang, feedbackMessage }: Props) {
+function SegmentedBar({
+  segments,
+  yearCurrent,
+}: {
+  segments: YearSegment[];
+  yearCurrent: number;
+}) {
+  return (
+    <div className="flex-1 flex items-center gap-0.5">
+      {segments.map((seg, idx) => {
+        const isCurrent = seg.year === yearCurrent;
+        const isPast = seg.year < yearCurrent;
+
+        const bgColor = seg.filled
+          ? "bg-green-500"
+          : seg.percent >= 40
+            ? "bg-yellow-500"
+            : isPast
+              ? "bg-destructive/60"
+              : "bg-muted-foreground/20";
+
+        return (
+          <div
+            key={seg.year}
+            className="relative flex-1 group"
+          >
+            {/* Segment background */}
+            <div
+              className={cn(
+                "h-2 overflow-hidden",
+                idx === 0 ? "rounded-s-full" : "",
+                idx === segments.length - 1 ? "rounded-e-full" : ""
+              )}
+            >
+              <div className="h-full bg-muted/60 w-full relative">
+                <div
+                  className={cn(
+                    "h-full transition-all duration-500",
+                    bgColor
+                  )}
+                  style={{ width: `${seg.percent}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Current year indicator */}
+            {isCurrent && (
+              <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2">
+                <span className="text-[8px] font-bold text-primary">▲</span>
+              </div>
+            )}
+
+            {/* Tooltip on hover */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              <div className="bg-popover text-popover-foreground text-[10px] px-1.5 py-0.5 rounded shadow-md border whitespace-nowrap">
+                {`S${seg.year}: ${seg.percent}%`}
+              </div>
+            </div>
+
+            {/* Divider line between segments */}
+            {idx < segments.length - 1 && (
+              <div className="absolute top-0 end-0 h-2 w-px bg-background z-[1]" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function SectionProgressBar({ progress, lang, feedbackMessage, yearSegments, yearCurrent }: Props) {
   const [open, setOpen] = useState(false);
   const l = (en: string, ar: string) => (lang === "ar" ? ar : en);
   const { percent, targets } = progress;
@@ -83,6 +156,8 @@ export default function SectionProgressBar({ progress, lang, feedbackMessage }: 
 
   const unmet = targets.filter((t) => !t.met);
   const tier = getTier(percent, lang);
+
+  const useSegmented = yearSegments && yearSegments.length > 1;
 
   // Feedback rendering
   const renderFeedback = () => {
@@ -121,12 +196,16 @@ export default function SectionProgressBar({ progress, lang, feedbackMessage }: 
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-2 group"
       >
-        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-          <div
-            className={cn("h-full rounded-full transition-all duration-500", barColor)}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
+        {useSegmented ? (
+          <SegmentedBar segments={yearSegments} yearCurrent={yearCurrent ?? 1} />
+        ) : (
+          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className={cn("h-full rounded-full transition-all duration-500", barColor)}
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        )}
         <span className={cn("text-[10px] font-bold min-w-[60px] text-end flex items-center justify-end gap-1", tier.color)}>
           {tier.icon}
           {tier.label}
@@ -139,6 +218,22 @@ export default function SectionProgressBar({ progress, lang, feedbackMessage }: 
           )
         )}
       </button>
+
+      {/* Year labels under segmented bar */}
+      {useSegmented && (
+        <div className="flex gap-0.5 px-0">
+          {yearSegments.map((seg) => (
+            <div key={seg.year} className="flex-1 text-center">
+              <span className={cn(
+                "text-[8px]",
+                seg.year === (yearCurrent ?? 1) ? "text-primary font-bold" : "text-muted-foreground"
+              )}>
+                {lang === "ar" ? `س${seg.year}` : `Y${seg.year}`}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Feedback message */}
       {renderFeedback()}

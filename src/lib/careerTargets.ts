@@ -487,6 +487,44 @@ export function computeSectionProgress(
   });
 }
 
+// ── Compute year-segmented progress for a section ──
+
+export interface YearSegment {
+  year: number;
+  filled: boolean;
+  percent: number;
+}
+
+export function computeYearSegments(
+  data: ResumeData,
+  persona: Persona,
+  sectionKey: string
+): YearSegment[] {
+  const yearTotal = persona.yearTotal ?? 4;
+  const segments: YearSegment[] = [];
+
+  for (let y = 1; y <= yearTotal; y++) {
+    const yearPersona = { ...persona, yearCurrent: y };
+    const allTargets = getTargets(yearPersona);
+    const sectionTargets = allTargets.filter((t) => t.sectionKey === sectionKey);
+
+    if (sectionTargets.length === 0) {
+      segments.push({ year: y, filled: true, percent: 100 });
+      continue;
+    }
+
+    const totalWeight = sectionTargets.reduce((sum, t) => sum + t.weight, 0);
+    const metWeight = sectionTargets
+      .filter((t) => t.check(data))
+      .reduce((sum, t) => sum + t.weight, 0);
+
+    const pct = totalWeight > 0 ? Math.round((metWeight / totalWeight) * 100) : 0;
+    segments.push({ year: y, filled: pct >= 70, percent: pct });
+  }
+
+  return segments;
+}
+
 // ── Compute weighted overall progress ──
 
 export function computeWeightedOverall(
