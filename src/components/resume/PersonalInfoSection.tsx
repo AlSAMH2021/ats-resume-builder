@@ -1,5 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import type { ResumeData } from "@/types/resume";
 
@@ -11,9 +12,13 @@ export default function PersonalInfoSection({ lang }: Props) {
   const { register } = useFormContext<ResumeData>();
 
   const fields = [
-    { name: "fullName" as const, en: "Name", ar: "الاسم" },
+    { name: "fullName" as const, en: "Full Name", ar: "الاسم الكامل" },
+    { name: "jobTitle" as const, en: "Job Title", ar: "المسمى الوظيفي" },
     { name: "email" as const, en: "Email", ar: "الايميل" },
     { name: "phone" as const, en: "Phone", ar: "رقم التواصل" },
+    { name: "location" as const, en: "Location", ar: "الموقع" },
+    { name: "linkedin" as const, en: "LinkedIn", ar: "لينكدإن" },
+    { name: "website" as const, en: "Portfolio / Website", ar: "معرض الأعمال / الموقع" },
   ];
 
   return (
@@ -28,6 +33,10 @@ export default function PersonalInfoSection({ lang }: Props) {
             <Input {...register(f.name)} className="mt-1 h-9 text-sm" />
           </div>
         ))}
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">{l(lang, "Professional Summary", "الوصف المهني")}</Label>
+        <Textarea {...register("summary")} className="mt-1 text-sm min-h-[80px]" placeholder={l(lang, "Brief professional summary...", "نبذة مهنية مختصرة...")} />
       </div>
     </div>
   );
