@@ -11,9 +11,13 @@ export default function PersonalInfoSection({ lang }: Props) {
   const { register } = useFormContext<ResumeData>();
 
   const fields = [
-    { name: "fullName" as const, en: "Name", ar: "الاسم" },
+    { name: "fullName" as const, en: "Full Name", ar: "الاسم الكامل" },
+    { name: "jobTitle" as const, en: "Job Title", ar: "المسمى الوظيفي" },
     { name: "email" as const, en: "Email", ar: "الايميل" },
     { name: "phone" as const, en: "Phone", ar: "رقم التواصل" },
+    { name: "location" as const, en: "Location", ar: "الموقع" },
+    { name: "linkedin" as const, en: "LinkedIn", ar: "لينكدإن" },
+    { name: "website" as const, en: "Portfolio / Website", ar: "معرض الأعمال / الموقع" },
   ];
 
   return (
