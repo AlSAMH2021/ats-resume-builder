@@ -13,8 +13,9 @@ export default function ResumePreview({ data, lang }: Props) {
   const contactParts: string[] = [];
   if (has(data.email)) contactParts.push(data.email!);
   if (has(data.phone)) contactParts.push(data.phone!);
-  if (has(data.linkedin)) contactParts.push(data.linkedin!);
   if (has(data.location)) contactParts.push(data.location!);
+  if (has(data.linkedin)) contactParts.push(data.linkedin!);
+  if (has(data.website)) contactParts.push(data.website!);
 
   return (
     <div
@@ -22,13 +23,16 @@ export default function ResumePreview({ data, lang }: Props) {
       dir={lang === 'ar' ? 'rtl' : 'ltr'}
       style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
     >
-      {/* Header: Name + Contact inline */}
+      {/* Header: Name + Job Title + Contact */}
       {(has(data.fullName) || contactParts.length > 0) && (
         <header className="text-center mb-4 pb-2 border-b border-black">
           {has(data.fullName) && (
-            <h1 className="text-[18pt] font-bold uppercase tracking-wide mb-1">
+            <h1 className="text-[18pt] font-bold uppercase tracking-wide mb-0.5">
               {data.fullName}
             </h1>
+          )}
+          {has(data.jobTitle) && (
+            <p className="text-[11pt] text-gray-800 mb-1">{data.jobTitle}</p>
           )}
           {contactParts.length > 0 && (
             <p className="text-[10pt] text-gray-700">
@@ -36,6 +40,16 @@ export default function ResumePreview({ data, lang }: Props) {
             </p>
           )}
         </header>
+      )}
+
+      {/* PROFESSIONAL SUMMARY */}
+      {has(data.summary) && (
+        <section className="mb-3">
+          <h2 className="text-[12pt] font-bold uppercase border-b border-gray-400 pb-0.5 mb-1.5 tracking-wide">
+            {l(lang, "PROFESSIONAL SUMMARY", "الوصف المهني")}
+          </h2>
+          <p className="text-[10.5pt]">{data.summary}</p>
+        </section>
       )}
 
       {/* EDUCATION */}
