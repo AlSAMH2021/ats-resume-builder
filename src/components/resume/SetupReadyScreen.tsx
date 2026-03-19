@@ -116,19 +116,15 @@ export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {
           <ul className="space-y-1.5 text-sm text-foreground">
             <li className="flex items-center gap-2">
               <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
-              {l("Professional summary tailored to your goal", "ملخص مهني مخصص لهدفك")}
+              {l("A draft CV with placeholder sections ready to fill", "مسودة سيرة ذاتية بأقسام جاهزة للتعبئة")}
             </li>
             <li className="flex items-center gap-2">
               <BarChart3 className="w-3.5 h-3.5 text-primary shrink-0" />
-              {l("Optimized section order for your profile", "ترتيب أقسام مُحسّن لملفك الشخصي")}
-            </li>
-            <li className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-primary shrink-0" />
-              {l("Industry-relevant skills pre-filled", "مهارات مملوءة تلقائياً حسب مجالك")}
+              {l("Section order optimized for your academic stage", "ترتيب أقسام مُحسّن لمرحلتك الأكاديمية")}
             </li>
             <li className="flex items-center gap-2">
               <Target className="w-3.5 h-3.5 text-primary shrink-0" />
-              {l("Career targets mapped to your academic year", "مستهدفات مهنية مرتبطة بسنتك الدراسية")}
+              {l("Career targets & checklist to track your progress", "مستهدفات مهنية وقائمة تتبّع لمتابعة تقدمك")}
             </li>
           </ul>
         </div>
