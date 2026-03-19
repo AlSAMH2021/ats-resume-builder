@@ -160,7 +160,17 @@ const Targets = () => {
         <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
         <h1 className="text-xl font-bold">لم يتم تحديد المستهدفات بعد</h1>
         <p className="text-muted-foreground">ابدأ بالاستبيان لتحديد أهدافك المهنية</p>
-        <Button onClick={() => navigate("/builder")} className="gap-2">
+        <Button onClick={() => {
+          // Clear all onboarding keys so the quiz re-appears
+          for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key?.startsWith(ONBOARDING_KEY_PREFIX)) {
+              localStorage.removeItem(key);
+            }
+          }
+          // Force reload to remount ProtectedLayout
+          window.location.href = "/builder";
+        }} className="gap-2">
           <Sparkles className="h-4 w-4" />
           بدء الاستبيان
         </Button>
