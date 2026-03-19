@@ -34,6 +34,10 @@ export default function PersonalInfoSection({ lang }: Props) {
           </div>
         ))}
       </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">{l(lang, "Professional Summary", "الوصف المهني")}</Label>
+        <Textarea {...register("summary")} className="mt-1 text-sm min-h-[80px]" placeholder={l(lang, "Brief professional summary...", "نبذة مهنية مختصرة...")} />
+      </div>
     </div>
   );
 }
