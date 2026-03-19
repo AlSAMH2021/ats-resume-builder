@@ -238,8 +238,8 @@ const Targets = () => {
       }
     }
     localStorage.removeItem(TARGETS_KEY);
-    toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان عند فتح البيلدر");
-    navigate("/builder");
+    toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان الآن");
+    window.location.href = "/builder";
   }, [navigate]);
 
   // Map milestone category to section key for checking
