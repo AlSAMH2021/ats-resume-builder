@@ -47,6 +47,14 @@ export default function EducationSection({ lang }: Props) {
               <Label className="text-xs text-muted-foreground">{l(lang, "University / Institution", "الجامعة")}</Label>
               <Input {...register(`education.${index}.institution`)} className="mt-0.5 h-8 text-sm" />
             </div>
+            <div>
+              <Label className="text-xs text-muted-foreground">{l(lang, "Start Date", "تاريخ البداية")}</Label>
+              <Input {...register(`education.${index}.startDate`)} placeholder={l(lang, "e.g. 2020", "مثال: 2020")} className="mt-0.5 h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground">{l(lang, "End Date", "تاريخ الانتهاء")}</Label>
+              <Input {...register(`education.${index}.endDate`)} placeholder={l(lang, "e.g. 2024", "مثال: 2024")} className="mt-0.5 h-8 text-sm" />
+            </div>
           </div>
         </div>
       ))}
