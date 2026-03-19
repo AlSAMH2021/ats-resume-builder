@@ -97,7 +97,7 @@ export default function TargetChecklist({ sections, lang, persona, nextPriority 
   );
 
   return (
-    <div className="rounded-xl border-2 border-primary/20 bg-card shadow-lg overflow-hidden">
+    <div className="overflow-hidden">
       {/* Header */}
       <button
         type="button"
