@@ -133,6 +133,14 @@ const Dashboard = () => {
 
   const unmetRequired = required.filter(t => !t.met);
 
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[60vh]" dir="rtl">
+        <span className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6" dir="rtl">
       {/* ─── 1. PAGE HEADER ─── */}
