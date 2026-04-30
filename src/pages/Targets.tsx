@@ -165,13 +165,9 @@ function MilestoneCard({ icon, label, category, checked }: {
 /* ── Main ── */
 const Targets = () => {
   const navigate = useNavigate();
+  const { loading, targets: cloudTargets, resume: cloudResume, resetAllTargets } = useUserData();
 
-  const targets: TargetsData | null = useMemo(() => {
-    try {
-      const saved = localStorage.getItem(TARGETS_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  }, []);
+  const targets: TargetsData | null = cloudTargets as TargetsData | null;
 
   const yearPlans = useMemo(() => {
     if (!targets) return [];
@@ -181,7 +177,10 @@ const Targets = () => {
   const [selectedYear, setSelectedYear] = useState(() => targets?.yearCurrent ?? 1);
   const selectedPlan: YearPlan | undefined = yearPlans.find(p => p.year === selectedYear);
 
-  const resumeData = useMemo(() => getResumeData(), []);
+  const resumeData: ResumeData | null = useMemo(
+    () => (cloudResume ? { ...defaultResumeData, ...cloudResume } : null),
+    [cloudResume]
+  );
 
   const persona = useMemo(() => {
     if (!targets) return null;
@@ -219,17 +218,16 @@ const Targets = () => {
     return map;
   }, [resumeData, persona, selectedYear]);
 
-  const handleResetTargets = useCallback(() => {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(ONBOARDING_KEY_PREFIX)) {
-        localStorage.removeItem(key);
-      }
+  const handleResetTargets = useCallback(async () => {
+    try {
+      await resetAllTargets();
+      toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان الآن");
+      window.location.href = "/builder";
+    } catch {
+      toast.error("تعذّر إعادة التعيين، حاول مرة أخرى");
     }
-    localStorage.removeItem(TARGETS_KEY);
-    toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان الآن");
-    window.location.href = "/builder";
-  }, [navigate]);
+  }, [resetAllTargets]);
+
 
   // Map milestone category to section key for checking
   const catToSection: Record<string, string> = {
