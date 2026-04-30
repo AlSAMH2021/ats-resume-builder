@@ -139,8 +139,8 @@ const Index = () => {
   }, [watchedData, lang]);
 
   const toggleLang = useCallback(() => {
-    setLang(prev => prev === 'en' ? 'ar' : 'en');
-  }, []);
+    setLang(lang === 'en' ? 'ar' : 'en');
+  }, [lang, setLang]);
 
   const l = (en: string, ar: string) => lang === 'ar' ? ar : en;
 
