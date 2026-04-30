@@ -267,11 +267,8 @@ const Targets = () => {
           <p>✦ خارطة طريق مخصصة لتخصصك وسنتك الدراسية</p>
           <p>✦ مستهدفات قابلة للتتبع لكل مرحلة</p>
         </div>
-        <Button onClick={() => {
-          for (let i = localStorage.length - 1; i >= 0; i--) {
-            const key = localStorage.key(i);
-            if (key?.startsWith(ONBOARDING_KEY_PREFIX)) localStorage.removeItem(key);
-          }
+        <Button onClick={async () => {
+          await resetAllTargets();
           window.location.href = "/builder";
         }} className="gap-2" size="lg">
           <Sparkles className="h-4 w-4" />
