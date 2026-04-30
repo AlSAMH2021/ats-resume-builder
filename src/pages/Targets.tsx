@@ -19,10 +19,7 @@ import { generateYearPlans, type YearPlan } from "@/lib/yearMilestones";
 import { computeSectionProgress, computeWeightedOverall } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
 import { defaultResumeData } from "@/types/resume";
-
-const TARGETS_KEY = "seeraty-targets";
-const ONBOARDING_KEY_PREFIX = "seeraty-onboarding-done-";
-const STORAGE_KEY = "ats-resume-data";
+import { useUserData } from "@/hooks/useUserData";
 
 interface TargetsData {
   stage: string;
@@ -56,14 +53,6 @@ const categoryGroupHeaders: Record<string, string> = {
   languages: "🌐 اللغات",
   personal: "🔗 الحضور الرقمي",
 };
-
-function getResumeData(): ResumeData | null {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...defaultResumeData, ...JSON.parse(saved) };
-  } catch {}
-  return null;
-}
 
 function getColor(pct: number) {
   if (pct >= 70) return "hsl(142 72% 42%)";
@@ -176,13 +165,9 @@ function MilestoneCard({ icon, label, category, checked }: {
 /* ── Main ── */
 const Targets = () => {
   const navigate = useNavigate();
+  const { loading, targets: cloudTargets, resume: cloudResume, resetAllTargets } = useUserData();
 
-  const targets: TargetsData | null = useMemo(() => {
-    try {
-      const saved = localStorage.getItem(TARGETS_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  }, []);
+  const targets: TargetsData | null = cloudTargets as TargetsData | null;
 
   const yearPlans = useMemo(() => {
     if (!targets) return [];
@@ -192,7 +177,10 @@ const Targets = () => {
   const [selectedYear, setSelectedYear] = useState(() => targets?.yearCurrent ?? 1);
   const selectedPlan: YearPlan | undefined = yearPlans.find(p => p.year === selectedYear);
 
-  const resumeData = useMemo(() => getResumeData(), []);
+  const resumeData: ResumeData | null = useMemo(
+    () => (cloudResume ? { ...defaultResumeData, ...cloudResume } : null),
+    [cloudResume]
+  );
 
   const persona = useMemo(() => {
     if (!targets) return null;
@@ -230,17 +218,16 @@ const Targets = () => {
     return map;
   }, [resumeData, persona, selectedYear]);
 
-  const handleResetTargets = useCallback(() => {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(ONBOARDING_KEY_PREFIX)) {
-        localStorage.removeItem(key);
-      }
+  const handleResetTargets = useCallback(async () => {
+    try {
+      await resetAllTargets();
+      toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان الآن");
+      window.location.href = "/builder";
+    } catch {
+      toast.error("تعذّر إعادة التعيين، حاول مرة أخرى");
     }
-    localStorage.removeItem(TARGETS_KEY);
-    toast.success("تم إعادة تعيين المستهدفات — سيظهر الاستبيان الآن");
-    window.location.href = "/builder";
-  }, [navigate]);
+  }, [resetAllTargets]);
+
 
   // Map milestone category to section key for checking
   const catToSection: Record<string, string> = {
@@ -269,6 +256,15 @@ const Targets = () => {
     return groups;
   }
 
+  // ── Loading ──
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[60vh]" dir="rtl">
+        <span className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
   // ── Empty state ──
   if (!targets) {
     return (
@@ -280,11 +276,8 @@ const Targets = () => {
           <p>✦ خارطة طريق مخصصة لتخصصك وسنتك الدراسية</p>
           <p>✦ مستهدفات قابلة للتتبع لكل مرحلة</p>
         </div>
-        <Button onClick={() => {
-          for (let i = localStorage.length - 1; i >= 0; i--) {
-            const key = localStorage.key(i);
-            if (key?.startsWith(ONBOARDING_KEY_PREFIX)) localStorage.removeItem(key);
-          }
+        <Button onClick={async () => {
+          await resetAllTargets();
           window.location.href = "/builder";
         }} className="gap-2" size="lg">
           <Sparkles className="h-4 w-4" />

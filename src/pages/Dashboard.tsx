@@ -19,9 +19,7 @@ import {
 } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
 import { defaultResumeData } from "@/types/resume";
-
-const STORAGE_KEY = "ats-resume-data";
-const TARGETS_KEY = "seeraty-targets";
+import { useUserData } from "@/hooks/useUserData";
 
 /* ── Radial gauge ─────────────────────────────────── */
 function RadialGauge({ percent, size = 120, stroke = 10, color, trackColor = "hsl(var(--muted))" }: {
@@ -69,32 +67,16 @@ function getStatus(pct: number) {
   return { label: "ضعيف", class: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
 }
 
-/* ── Helper ────────────────────────────────────────── */
-function getResumeData(): ResumeData | null {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...defaultResumeData, ...JSON.parse(saved) };
-  } catch {}
-  return null;
-}
-
-function getTargetsData() {
-  try {
-    const saved = localStorage.getItem(TARGETS_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch {}
-  return null;
-}
-
 /* ── Main Dashboard ───────────────────────────────── */
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showUnmet, setShowUnmet] = useState(false);
+  const { loading, resume: cloudResume, targets: cloudTargets } = useUserData();
 
   const { overallScore, sections, targets, resumeData, persona } = useMemo(() => {
-    const resumeData = getResumeData();
-    const targets = getTargetsData();
+    const resumeData: ResumeData | null = cloudResume ? { ...defaultResumeData, ...cloudResume } : null;
+    const targets = cloudTargets;
 
     if (!resumeData || !targets) {
       return { overallScore: 0, sections: [] as SectionProgress[], targets, resumeData, persona: null };
@@ -112,7 +94,7 @@ const Dashboard = () => {
     const overall = computeWeightedOverall(secs, persona);
 
     return { overallScore: overall, sections: secs, targets, resumeData, persona };
-  }, []);
+  }, [cloudResume, cloudTargets]);
 
   const overallColor = getColor(overallScore);
 
@@ -132,18 +114,16 @@ const Dashboard = () => {
 
   // Year data
   const yearData = useMemo(() => {
-    if (!persona || persona.yearTotal <= 1) return [];
-    const rd = getResumeData();
-    if (!rd) return [];
+    if (!persona || persona.yearTotal <= 1 || !resumeData) return [];
     const result: { year: number; percent: number }[] = [];
     for (let y = 1; y <= persona.yearTotal; y++) {
       const yPersona = { ...persona, yearCurrent: y };
-      const ySections = computeSectionProgress(rd, yPersona);
+      const ySections = computeSectionProgress(resumeData, yPersona);
       const overall = computeWeightedOverall(ySections, yPersona);
       result.push({ year: y, percent: overall });
     }
     return result;
-  }, [persona]);
+  }, [persona, resumeData]);
 
   // Weak sections for tips
   const weakSections = [...sections]
@@ -152,6 +132,14 @@ const Dashboard = () => {
     .slice(0, 3);
 
   const unmetRequired = required.filter(t => !t.met);
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[60vh]" dir="rtl">
+        <span className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6" dir="rtl">
