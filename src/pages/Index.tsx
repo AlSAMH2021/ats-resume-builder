@@ -23,37 +23,38 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import seeratyLogo from "@/assets/seeraty_logo.png";
-
-const STORAGE_KEY = "ats-resume-data";
-const TARGETS_KEY = "seeraty-targets";
-
-function loadSavedData(): ResumeData {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch {}
-  return defaultResumeData;
-}
+import { useUserData } from "@/hooks/useUserData";
 
 const Index = () => {
-  const [lang, setLang] = useState<'en' | 'ar'>('ar');
-  const [targets, setTargets] = useState<OnboardingTargets | null>(() => {
-    try {
-      const saved = localStorage.getItem(TARGETS_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  });
+  const {
+    loading: dataLoading,
+    resume: cloudResume,
+    targets,
+    lang,
+    setLang,
+    saveResumeDataDebounced,
+    clearResume,
+  } = useUserData();
+
   const [showChecklist, setShowChecklist] = useState(true);
   const [sectionProgress, setSectionProgress] = useState<SectionProgress[]>([]);
   const [nextPriority, setNextPriority] = useState<{ sectionKey: string; labelEn: string; labelAr: string; gainPercent: number } | null>(null);
 
   const form = useForm<ResumeData>({
     resolver: zodResolver(resumeSchema),
-    defaultValues: loadSavedData(),
+    defaultValues: defaultResumeData,
     mode: "onChange",
   });
 
   const watchedData = form.watch();
+
+  // Load cloud resume into the form once it arrives
+  useEffect(() => {
+    if (cloudResume) {
+      form.reset(cloudResume);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cloudResume]);
 
   // Load from shared URL on mount
   useEffect(() => {
@@ -66,28 +67,14 @@ const Index = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-save
+  // Auto-save (debounced) to cloud
   useEffect(() => {
+    if (dataLoading) return;
     const sub = form.watch((data) => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch {}
+      saveResumeDataDebounced(data as ResumeData, lang);
     });
     return () => sub.unsubscribe();
-  }, [form]);
-
-  // Listen for targets changes
-  useEffect(() => {
-    const handler = () => {
-      try {
-        const saved = localStorage.getItem(TARGETS_KEY);
-        setTargets(saved ? JSON.parse(saved) : null);
-      } catch {}
-    };
-    window.addEventListener("storage", handler);
-    handler();
-    return () => window.removeEventListener("storage", handler);
-  }, []);
+  }, [form, saveResumeDataDebounced, lang, dataLoading]);
 
   // Compute overall score
   const persona = useMemo(() => {
