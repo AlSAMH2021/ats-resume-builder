@@ -19,9 +19,7 @@ import {
 } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
 import { defaultResumeData } from "@/types/resume";
-
-const STORAGE_KEY = "ats-resume-data";
-const TARGETS_KEY = "seeraty-targets";
+import { useUserData } from "@/hooks/useUserData";
 
 /* ── Radial gauge ─────────────────────────────────── */
 function RadialGauge({ percent, size = 120, stroke = 10, color, trackColor = "hsl(var(--muted))" }: {
