@@ -72,10 +72,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showUnmet, setShowUnmet] = useState(false);
+  const { loading, resume: cloudResume, targets: cloudTargets } = useUserData();
 
   const { overallScore, sections, targets, resumeData, persona } = useMemo(() => {
-    const resumeData = getResumeData();
-    const targets = getTargetsData();
+    const resumeData: ResumeData | null = cloudResume ? { ...defaultResumeData, ...cloudResume } : null;
+    const targets = cloudTargets;
 
     if (!resumeData || !targets) {
       return { overallScore: 0, sections: [] as SectionProgress[], targets, resumeData, persona: null };
@@ -93,7 +94,7 @@ const Dashboard = () => {
     const overall = computeWeightedOverall(secs, persona);
 
     return { overallScore: overall, sections: secs, targets, resumeData, persona };
-  }, []);
+  }, [cloudResume, cloudTargets]);
 
   const overallColor = getColor(overallScore);
 
@@ -113,18 +114,16 @@ const Dashboard = () => {
 
   // Year data
   const yearData = useMemo(() => {
-    if (!persona || persona.yearTotal <= 1) return [];
-    const rd = getResumeData();
-    if (!rd) return [];
+    if (!persona || persona.yearTotal <= 1 || !resumeData) return [];
     const result: { year: number; percent: number }[] = [];
     for (let y = 1; y <= persona.yearTotal; y++) {
       const yPersona = { ...persona, yearCurrent: y };
-      const ySections = computeSectionProgress(rd, yPersona);
+      const ySections = computeSectionProgress(resumeData, yPersona);
       const overall = computeWeightedOverall(ySections, yPersona);
       result.push({ year: y, percent: overall });
     }
     return result;
-  }, [persona]);
+  }, [persona, resumeData]);
 
   // Weak sections for tips
   const weakSections = [...sections]
