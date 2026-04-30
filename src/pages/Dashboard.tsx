@@ -67,23 +67,6 @@ function getStatus(pct: number) {
   return { label: "ضعيف", class: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
 }
 
-/* ── Helper ────────────────────────────────────────── */
-function getResumeData(): ResumeData | null {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...defaultResumeData, ...JSON.parse(saved) };
-  } catch {}
-  return null;
-}
-
-function getTargetsData() {
-  try {
-    const saved = localStorage.getItem(TARGETS_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch {}
-  return null;
-}
-
 /* ── Main Dashboard ───────────────────────────────── */
 const Dashboard = () => {
   const navigate = useNavigate();
