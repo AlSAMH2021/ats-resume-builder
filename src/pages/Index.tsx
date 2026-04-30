@@ -99,11 +99,11 @@ const Index = () => {
     toast.success(lang === 'ar' ? "تم تحميل البيانات التجريبية" : "Demo data loaded");
   }, [form, lang]);
 
-  const handleReset = useCallback(() => {
+  const handleReset = useCallback(async () => {
     form.reset(defaultResumeData);
-    localStorage.removeItem(STORAGE_KEY);
+    await clearResume();
     toast.success(lang === 'ar' ? "تم مسح جميع البيانات" : "All data cleared");
-  }, [form, lang]);
+  }, [form, lang, clearResume]);
 
   const handlePrint = useCallback(() => {
     window.print();
