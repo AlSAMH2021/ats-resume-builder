@@ -50,7 +50,7 @@ export async function fetchTargets(userId: string): Promise<UserTargetsRow> {
     .maybeSingle();
   if (error) throw error;
   return {
-    targets: (data?.targets as OnboardingTargets) ?? null,
+    targets: (data?.targets as unknown as OnboardingTargets) ?? null,
     persona: data?.persona ?? null,
     onboarding_done: data?.onboarding_done ?? false,
   };
