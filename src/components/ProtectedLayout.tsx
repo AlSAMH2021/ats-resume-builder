@@ -1,50 +1,36 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserData } from "@/hooks/useUserData";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import OnboardingQuiz, { type OnboardingTargets } from "@/components/resume/OnboardingQuiz";
 import SetupReadyScreen from "@/components/resume/SetupReadyScreen";
 import { generateSmartSetup, type SmartSetupResult } from "@/lib/smartSetup";
-
-const ONBOARDING_KEY_PREFIX = "seeraty-onboarding-done-";
-const TARGETS_KEY = "seeraty-targets";
+import { useState } from "react";
 
 const ProtectedLayout = () => {
-  const { user, loading } = useAuth();
-
-  const getOnboardingKey = () => user ? `${ONBOARDING_KEY_PREFIX}${user.id}` : "";
-
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    if (!user) return false;
-    return !localStorage.getItem(`${ONBOARDING_KEY_PREFIX}${user.id}`);
-  });
+  const { user, loading: authLoading } = useAuth();
+  const { loading: dataLoading, targets, onboardingDone, lang, saveTargetsData, setLang } = useUserData();
 
   const [smartSetup, setSmartSetup] = useState<SmartSetupResult | null>(null);
-  const [lang, setLang] = useState<'en' | 'ar'>('ar');
 
-  const handleOnboardingComplete = useCallback((t: OnboardingTargets) => {
+  const handleOnboardingComplete = useCallback(async (t: OnboardingTargets) => {
     setLang(t.language as 'en' | 'ar');
-    localStorage.setItem(getOnboardingKey(), "true");
-    localStorage.setItem(TARGETS_KEY, JSON.stringify(t));
-    localStorage.setItem("seeraty-persona", t.stage);
-    setShowOnboarding(false);
+    await saveTargetsData({ targets: t, persona: t.stage, onboarding_done: true });
     const setup = generateSmartSetup(t);
     setSmartSetup(setup);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [saveTargetsData, setLang]);
 
-  const handleOnboardingSkip = useCallback(() => {
-    localStorage.setItem(getOnboardingKey(), "true");
-    setShowOnboarding(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  const handleOnboardingSkip = useCallback(async () => {
+    await saveTargetsData({ onboarding_done: true });
+  }, [saveTargetsData]);
 
   const handleSetupOpen = useCallback(() => {
     setSmartSetup(null);
   }, []);
 
-  if (loading) {
+  if (authLoading || (user && dataLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <span className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
@@ -56,7 +42,7 @@ const ProtectedLayout = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (showOnboarding) {
+  if (!onboardingDone) {
     return <OnboardingQuiz lang={lang} onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />;
   }
 
