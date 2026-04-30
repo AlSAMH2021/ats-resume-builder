@@ -19,10 +19,7 @@ import { generateYearPlans, type YearPlan } from "@/lib/yearMilestones";
 import { computeSectionProgress, computeWeightedOverall } from "@/lib/careerTargets";
 import type { ResumeData } from "@/types/resume";
 import { defaultResumeData } from "@/types/resume";
-
-const TARGETS_KEY = "seeraty-targets";
-const ONBOARDING_KEY_PREFIX = "seeraty-onboarding-done-";
-const STORAGE_KEY = "ats-resume-data";
+import { useUserData } from "@/hooks/useUserData";
 
 interface TargetsData {
   stage: string;
@@ -56,14 +53,6 @@ const categoryGroupHeaders: Record<string, string> = {
   languages: "🌐 اللغات",
   personal: "🔗 الحضور الرقمي",
 };
-
-function getResumeData(): ResumeData | null {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...defaultResumeData, ...JSON.parse(saved) };
-  } catch {}
-  return null;
-}
 
 function getColor(pct: number) {
   if (pct >= 70) return "hsl(142 72% 42%)";
