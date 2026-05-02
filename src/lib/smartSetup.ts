@@ -10,12 +10,20 @@ import {
   type SectionKey,
 } from "@/lib/personaEngine";
 
+export interface SetupSummaryItem {
+  labelEn: string;
+  labelAr: string;
+  valueEn: string;
+  valueAr: string;
+}
+
 export interface SmartSetupResult {
   template: TemplateName;
   templateReasonEn: string;
   templateReasonAr: string;
   strengthsEn: string[];
   strengthsAr: string[];
+  setupSummary: SetupSummaryItem[];
   sectionOrder: SectionKey[];
   prefilled: ResumeData;
 }
@@ -211,6 +219,40 @@ function buildStrengths(t: OnboardingTargets): { en: string[]; ar: string[] } {
   return { en, ar };
 }
 
+// ── Setup summary builder ──
+function buildSetupSummary(t: OnboardingTargets): SetupSummaryItem[] {
+  const field = FIELD_CONFIG[t.industry as keyof typeof FIELD_CONFIG] ?? FIELD_CONFIG.other;
+  const goalCfg = GOAL_CONFIG[t.goal as keyof typeof GOAL_CONFIG];
+  const persona = PERSONA_CONFIG[t.stage as keyof typeof PERSONA_CONFIG];
+
+  return [
+    {
+      labelEn: "Academic Stage",
+      labelAr: "المرحلة الأكاديمية",
+      valueEn: persona?.labelEn ?? t.stage,
+      valueAr: persona?.labelAr ?? t.stage,
+    },
+    {
+      labelEn: "Specialization",
+      labelAr: "التخصص",
+      valueEn: field.labelEn,
+      valueAr: field.labelAr,
+    },
+    {
+      labelEn: "Career Goal",
+      labelAr: "الهدف المهني",
+      valueEn: goalCfg?.labelEn ?? t.goal,
+      valueAr: goalCfg?.labelAr ?? t.goal,
+    },
+    {
+      labelEn: "CV Language",
+      labelAr: "لغة السيرة",
+      valueEn: t.language === "ar" ? "Arabic" : "English",
+      valueAr: t.language === "ar" ? "العربية" : "الإنجليزية",
+    },
+  ];
+}
+
 // ── Main export ──
 export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult {
   const stage = targets.stage as "freshman" | "student" | "graduate";
@@ -218,6 +260,7 @@ export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult
   const sectionOrder = buildSectionOrder(targets);
   const prefilled = generatePrefilled(targets);
   const strengths = buildStrengths(targets);
+  const setupSummary = buildSetupSummary(targets);
 
   return {
     template,
@@ -225,6 +268,7 @@ export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult
     templateReasonAr: reasonAr,
     strengthsEn: strengths.en,
     strengthsAr: strengths.ar,
+    setupSummary,
     sectionOrder,
     prefilled,
   };

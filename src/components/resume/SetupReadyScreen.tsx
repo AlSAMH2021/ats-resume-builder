@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Sparkles, Zap, ArrowRight, Loader2, FileText, BarChart3, Target } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, FileText, BarChart3, Target, ClipboardList, GraduationCap, Briefcase, BookOpen, Globe } from "lucide-react";
 import type { SmartSetupResult } from "@/lib/smartSetup";
 import seeratyLogo from "@/assets/seeraty_logo.png";
 
@@ -10,6 +10,8 @@ interface Props {
   lang: "en" | "ar";
   onOpen: () => void;
 }
+
+const summaryIcons = [GraduationCap, BookOpen, Briefcase, Globe];
 
 export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {
   const [loading, setLoading] = useState(true);
@@ -30,8 +32,6 @@ export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {
     }, 600);
     return () => clearInterval(interval);
   }, []);
-
-  const strengths = lang === "ar" ? setup.strengthsAr : setup.strengthsEn;
 
   if (loading) {
     return (
@@ -90,21 +90,31 @@ export default function SetupReadyScreen({ setup, lang, onOpen }: Props) {
           </p>
         </div>
 
-        {/* Strengths */}
+        {/* Setup Summary */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+            <ClipboardList className="w-5 h-5 text-primary" />
             <span className="font-semibold text-foreground">
-              {l("Your Highlighted Strengths", "نقاط قوتك المميزة")}
+              {l("Your Setup Summary", "ملخص الإعداد")}
             </span>
           </div>
-          <div className="space-y-2">
-            {strengths.map((s, i) => (
-              <div key={i} className="flex items-center gap-3 rounded-lg bg-card border p-3">
-                <Zap className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-sm text-foreground">{s}</span>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 gap-2">
+            {setup.setupSummary.map((item, i) => {
+              const Icon = summaryIcons[i] ?? ClipboardList;
+              return (
+                <div key={i} className="rounded-lg bg-card border p-3 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <span className="text-xs text-muted-foreground">
+                      {lang === "ar" ? item.labelAr : item.labelEn}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-foreground">
+                    {lang === "ar" ? item.valueAr : item.valueEn}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
