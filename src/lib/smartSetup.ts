@@ -10,12 +10,20 @@ import {
   type SectionKey,
 } from "@/lib/personaEngine";
 
+export interface SetupSummaryItem {
+  labelEn: string;
+  labelAr: string;
+  valueEn: string;
+  valueAr: string;
+}
+
 export interface SmartSetupResult {
   template: TemplateName;
   templateReasonEn: string;
   templateReasonAr: string;
   strengthsEn: string[];
   strengthsAr: string[];
+  setupSummary: SetupSummaryItem[];
   sectionOrder: SectionKey[];
   prefilled: ResumeData;
 }
