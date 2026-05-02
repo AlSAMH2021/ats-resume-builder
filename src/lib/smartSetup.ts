@@ -168,20 +168,63 @@ function buildProjects(t: OnboardingTargets): ResumeData["projects"] {
   ];
 }
 
+// ── Dynamic strengths based on actual answers ──
+function buildStrengths(t: OnboardingTargets): { en: string[]; ar: string[] } {
+  const stage = t.stage as "freshman" | "student" | "graduate";
+  const goal = t.goal as string;
+  const field = FIELD_CONFIG[t.industry as keyof typeof FIELD_CONFIG] ?? FIELD_CONFIG.other;
+
+  const en: string[] = [];
+  const ar: string[] = [];
+
+  // 1st strength: based on field/industry
+  en.push(`Specialized skills in ${field.labelEn}`);
+  ar.push(`مهارات متخصصة في ${field.labelAr}`);
+
+  // 2nd strength: based on stage
+  if (stage === "freshman") {
+    en.push("Quick learner with a growth mindset & eagerness to develop");
+    ar.push("سرعة تعلّم وعقلية تطوير مستمر وشغف بالنمو");
+  } else if (stage === "student") {
+    en.push("Hands-on project experience & strong academic foundation");
+    ar.push("خبرة عملية في المشاريع وأساس أكاديمي متين");
+  } else {
+    en.push("Solid academic foundation & practical experience ready for the job market");
+    ar.push("أساس أكاديمي متين وخبرة عملية جاهزة لسوق العمل");
+  }
+
+  // 3rd strength: based on goal
+  if (goal === "volunteering") {
+    en.push("Community engagement & strong interpersonal skills");
+    ar.push("مشاركة مجتمعية فعّالة ومهارات تواصل قوية");
+  } else if (goal === "internship") {
+    en.push("Technical readiness & motivation to gain professional experience");
+    ar.push("جاهزية تقنية ودافع قوي لاكتساب خبرة مهنية");
+  } else if (goal === "part-time") {
+    en.push("Excellent time management & ability to balance work and study");
+    ar.push("إدارة وقت ممتازة وقدرة على الموازنة بين العمل والدراسة");
+  } else {
+    en.push("Professional ambition & readiness to contribute from day one");
+    ar.push("طموح مهني وجاهزية للمساهمة من اليوم الأول");
+  }
+
+  return { en, ar };
+}
+
 // ── Main export ──
 export function generateSmartSetup(targets: OnboardingTargets): SmartSetupResult {
   const stage = targets.stage as "freshman" | "student" | "graduate";
   const { template, reasonEn, reasonAr } = pickTemplate(targets);
-  const persona = PERSONA_CONFIG[stage];
   const sectionOrder = buildSectionOrder(targets);
   const prefilled = generatePrefilled(targets);
+  const strengths = buildStrengths(targets);
 
   return {
     template,
     templateReasonEn: reasonEn,
     templateReasonAr: reasonAr,
-    strengthsEn: [...persona.strengthsEn],
-    strengthsAr: [...persona.strengthsAr],
+    strengthsEn: strengths.en,
+    strengthsAr: strengths.ar,
     sectionOrder,
     prefilled,
   };
